@@ -3,6 +3,7 @@ import Header from "./Header";
 import Footer from "./Footer";
 import Title from "../shared/Title";
 import { Grid } from "@mui/material";
+import ChatList from "../specific/ChatList";
 
 const AppLayout = () => (WrappedComponent: React.FC) => {
   return (props) => {
@@ -21,7 +22,7 @@ const AppLayout = () => (WrappedComponent: React.FC) => {
             }}
             height={"100%"}
           >
-            first
+            <ChatList chats={[1, 23, 4, 5, 6, 7, 7, 65, 5]} />
           </Grid>
           <Grid
             item
