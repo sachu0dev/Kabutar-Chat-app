@@ -1,12 +1,22 @@
 import React from "react";
 import Header from "./Header";
-import Footer from "./Footer";
 import Title from "../shared/Title";
 import { Grid } from "@mui/material";
 import ChatList from "../specific/ChatList";
+import { sampleChats } from "../../constants/sampleData";
+import { useParams } from "react-router-dom";
+import Profile from "../specific/Profile";
 
 const AppLayout = () => (WrappedComponent: React.FC) => {
   return (props) => {
+    const params = useParams();
+
+    const chatId = params.chatId;
+
+    const handleDeleteChat = (e, _id, groupChat) => {
+      e.preventDefault();
+      console.log(_id, groupChat);
+    };
     return (
       <>
         <Title title="chat" description="a chat app" />
@@ -20,9 +30,20 @@ const AppLayout = () => (WrappedComponent: React.FC) => {
             sx={{
               display: { xs: "none", sm: "block" },
             }}
-            height={"100%"}
+            height={"calc(100vh - 4rem"}
           >
-            <ChatList chats={[1, 23, 4, 5, 6, 7, 7, 65, 5]} />
+            <ChatList
+              chats={sampleChats}
+              chatId={chatId}
+              newMessagesAlert={[
+                {
+                  chatId,
+                  count: 4,
+                },
+              ]}
+              onlineUsers={["1", "2"]}
+              handleDeleteChat={handleDeleteChat}
+            />
           </Grid>
           <Grid
             item
@@ -44,12 +65,12 @@ const AppLayout = () => (WrappedComponent: React.FC) => {
                 xs: "none",
                 md: "block",
                 padding: "2rem",
-                bgcolor: "primary.main",
               },
             }}
-            height={"100%"}
+            height={"calc(100vh - 4rem)"}
+            bgcolor={"#1d1c20"}
           >
-            third
+            <Profile />
           </Grid>
         </Grid>
       </>

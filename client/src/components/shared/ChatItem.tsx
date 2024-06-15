@@ -1,6 +1,7 @@
 import React, { memo } from "react";
 import { Link } from "../styles/StyledComponents";
 import { Box, Stack, Typography } from "@mui/material";
+import AvatarCard from "./AvatarCard";
 
 const ChatItem = ({
   avatar = [],
@@ -9,32 +10,34 @@ const ChatItem = ({
   groupChat = false,
   sameSender,
   isOnline,
-  newMessagesAlert,
-  index = 0,
-  handleDeleteChatOpen,
+  newMessageAlert,
+  handleDeleteChat,
 }) => {
   return (
     <Link
+      sx={{ padding: 0 }}
       to={`/chat/${_id}`}
-      onContextMenu={(e) => handleDeleteChatOpen(e, _id, groupChat)}
+      onContextMenu={(e) => handleDeleteChat(e, _id, groupChat)}
     >
-      {" "}
-      <div
-        style={{
+      <Box
+        sx={{
           display: "flex",
           alignItems: "center",
-          padding: " 1rem",
+          justifyContent: "space-between",
+          padding: "1rem",
           backgroundColor: sameSender ? "black" : "unset",
           color: sameSender ? "white" : "unset",
           position: "relative",
           gap: "1rem",
+          cursor: "pointer",
+          height: "6rem",
         }}
       >
-        {/* avatar card */}
+        <AvatarCard avatar={avatar} />
         <Stack>
           <Typography>{name}</Typography>
-          {newMessagesAlert && (
-            <Typography>{newMessagesAlert.count} New Message</Typography>
+          {newMessageAlert && (
+            <Typography>{newMessageAlert.count} New Message</Typography>
           )}
         </Stack>
         {isOnline && (
@@ -44,14 +47,10 @@ const ChatItem = ({
               height: "0.5rem",
               bgcolor: "green",
               borderRadius: "50%",
-              position: "absolute",
-              right: "50%",
-              top: "1rem",
-              transform: "translateX(-50%)",
             }}
           />
         )}
-      </div>
+      </Box>
     </Link>
   );
 };
