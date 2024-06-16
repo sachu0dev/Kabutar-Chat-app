@@ -18,14 +18,23 @@ const NewGroup = () => {
   const groupName = useInputValidation("");
 
   const selectMembersHandler = (_id) => {
-    console.log(_id);
+    setSelectedUsers((prev) =>
+      prev.includes(_id)
+        ? prev.filter((currElement) => currElement !== _id)
+        : [...prev, _id]
+    );
   };
+  console.log(selectedUsers);
 
   const submitHandler = () => {
     console.log("submitHandler");
   };
+
+  const closeHandler = () => {
+    console.log("closeHandler");
+  };
   return (
-    <Dialog open>
+    <Dialog open onClose={closeHandler}>
       <Stack p={{ xs: "1rem", sm: "3rem" }} width={"25rem"} spacing={"2rem"}>
         <DialogTitle textAlign={"center"} variant="h4">
           New Group
@@ -42,6 +51,7 @@ const NewGroup = () => {
               user={user}
               key={user._id}
               handler={selectMembersHandler}
+              isAdded={selectedUsers.includes(user._id)}
             />
           ))}
         </Stack>

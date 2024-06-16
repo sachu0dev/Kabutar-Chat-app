@@ -74,3 +74,72 @@ export const sampleNotifications = [
     _id: "3",
   },
 ];
+
+export const sampleMessages = [
+  {
+    attachments: [
+      {
+        public_id: "1",
+        url: "https://static.vecteezy.com/system/resources/previews/027/951/137/large_2x/stylish-spectacles-guy-3d-avatar-character-illustrations-png.png",
+      },
+    ],
+    content: "Hello, Bholda tu kitna Bhola hai",
+    _id: "1",
+    sender: {
+      _id: "1",
+      name: "bhola",
+    },
+    chat: "chat_id",
+    createdAt: "2022-03-26T10:43:36.000Z",
+  },
+  {
+    attachments: [],
+    content: "Hello, Bholda tu kitna Bhola hai",
+    _id: "2",
+    sender: {
+      _id: "user_id",
+      name: "bhola",
+    },
+    chat: "chat_id",
+    createdAt: "2022-03-26T10:43:36.000Z",
+  },
+  {
+    attachments: [
+      {
+        public_id: "1",
+        url: "https://static.vecteezy.com/system/resources/previews/027/951/137/large_2x/stylish-spectacles-guy-3d-avatar-character-illustrations-png.png",
+      },
+    ],
+    content: "Hello, Bholda tu kitna Bhola hai",
+    _id: "3",
+    sender: {
+      _id: "1",
+      name: "bhola",
+    },
+    chat: "chat_id",
+    createdAt: "2022-03-26T10:43:36.000Z",
+  },
+
+  {
+    attachments: [],
+    content: "Hello, Bholda tu kitna Bhola hai",
+    _id: "4",
+    sender: {
+      _id: "user_id",
+      name: "bhola",
+    },
+    chat: "chat_id",
+    createdAt: "2022-03-26T10:43:36.000Z",
+  },
+  {
+    attachments: [],
+    content: "Hello, Bholda tu kitna Bhola hai",
+    _id: "5",
+    sender: {
+      _id: "user_id",
+      name: "bhola",
+    },
+    chat: "chat_id",
+    createdAt: "2022-03-26T10:43:36.000Z",
+  },
+];
