@@ -9,7 +9,7 @@ interface AvatarCardProps {
 
 const AvatarCard: React.FC<AvatarCardProps> = ({ avatar = [], max = 4 }) => {
   return (
-    <Stack direction={"row"} spacing={0.5}>
+    <Stack direction={"row"} spacing={0.5} position={"relative"}>
       <AvatarGroup max={max}>
         {avatar?.map((src, index) => (
           <Avatar

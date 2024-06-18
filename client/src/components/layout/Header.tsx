@@ -65,8 +65,10 @@ const Header = () => {
         <AppBar position="static" sx={{ bgcolor: orange }}>
           <Toolbar>
             <Typography
+              onClick={() => navigate("/")}
               variant="h6"
               sx={{ display: { xs: "none", sm: "block" } }}
+              style={{ cursor: "pointer" }}
             >
               Kabutar
             </Typography>
