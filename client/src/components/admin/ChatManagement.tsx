@@ -1,10 +1,70 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import AdminLayout from "../layout/AdminLayout";
+import Table from "../shared/Table";
+import { Avatar, Stack } from "@mui/material";
+import { DashboardData } from "../../constants/sampleData";
+import { transformImage } from "../../lib/features";
 
+const columns = [
+  {
+    field: "id",
+    headerName: "ID",
+    headerClassName: "table-header",
+    width: 200,
+  },
+  {
+    field: "attachments",
+    headerName: "Attachments",
+    headerClassName: "table-header",
+    width: 200,
+    renderCell: (params) => (
+      <Avatar alt={params.row.name} src={params.row.avatar} />
+    ),
+  },
+  {
+    field: "content",
+    headerName: "Content",
+    headerClassName: "table-header",
+    width: 400,
+  },
+  {
+    field: "sender",
+    headerName: "Sent By",
+    headerClassName: "table-header",
+    width: 200,
+    renderCell: (params) => (
+      <Stack>
+        <Avatar alt={params.row.sender.name} src={params.row.sender.avatar} />
+        <span>{params.row.sender.name}</span>
+      </Stack>
+    ),
+  },
+  {
+    field: "chat",
+    headerName: "Chat",
+    headerClassName: "table-header",
+    width: 220,
+  },
+  {
+    field: "groupChat",
+    headerName: "Group Chat",
+    headerClassName: "table-header",
+    width: 100,
+  },
+  {
+    field: "createdAt",
+    headerName: "Time",
+    headerClassName: "table-header",
+    width: 250,
+  },
+];
 const ChatManagement = () => {
+  const [rows, setRows] = useState([]);
+
+  useEffect(() => {}, []);
   return (
     <AdminLayout>
-      <div>ChatManagement</div>
+      <Table heading={"All Chats"} rows={rows} columns={columns} />
     </AdminLayout>
   );
 };

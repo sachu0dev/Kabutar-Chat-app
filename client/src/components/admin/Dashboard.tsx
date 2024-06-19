@@ -1,6 +1,7 @@
 import {
   AdminPanelSettings as AdminPanelSettingsIcon,
   Group as GroupIcon,
+  Message as MessageIcon,
   Notifications as NotificationsIcon,
   Person as PersonIcon,
 } from "@mui/icons-material";
@@ -8,6 +9,7 @@ import { Box, Container, Paper, Stack, Typography } from "@mui/material";
 import moment from "moment";
 import AdminLayout from "../layout/AdminLayout";
 import { CurveButton, SearchField } from "../styles/StyledComponents";
+import { DoughnutChart, LineChart } from "../specific/Charts";
 
 const Dashboard = () => {
   const Appbar = (
@@ -35,22 +37,46 @@ const Dashboard = () => {
     </Paper>
   );
 
-  const Widgets = <>lfkdls</>;
+  const Widgets = (
+    <Stack
+      direction={{ xs: "column", sm: "row" }}
+      spacing={"2rem"}
+      justifyContent={"space-between"}
+      alignItems={"center"}
+      margin={"2rem 0"}
+    >
+      <Widget title={"users"} value={"50"} Icon={<PersonIcon />} />
+      <Widget title={"chats"} value={"10"} Icon={<GroupIcon />} />
+      <Widget title={"Messages"} value={"10454"} Icon={<MessageIcon />} />
+    </Stack>
+  );
   return (
     <AdminLayout>
-      <Container component={"main"}>
+      <Container component={"main"} sx={{ height: "100vh", overflow: "auto" }}>
         {Appbar}
-        <Stack direction={"row"} flexWrap={"wrap"} spacing={"2rem"}>
+        <Stack
+          direction={{
+            xs: "column",
+            lg: "row",
+          }}
+          flexWrap={"wrap"}
+          alignItems={{
+            xs: "center",
+            lg: "stretch",
+          }}
+          sx={{ gap: "2rem" }}
+        >
           <Paper
             sx={{
               padding: "2rem 3rem",
               borderRadius: "1rem",
               width: "100%",
               maxWidth: "45rem",
+              height: "25rem",
             }}
           >
             <Typography>Last Messages</Typography>
-            {"Chat"}
+            <LineChart value={[100, 200, 150, 0]} />
           </Paper>
           <Paper
             elevation={3}
@@ -60,14 +86,16 @@ const Dashboard = () => {
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
-              width: { xs: "100%", sm: "50%" },
               position: "relative",
               width: "100%",
               maxWidth: "25rem",
               height: "25rem",
             }}
           >
-            {"Dougnut Chart"}
+            <DoughnutChart
+              labels={["Single Messages", "Group Messages"]}
+              value={[80, 20]}
+            />
             <Stack
               position={"absolute"}
               direction={"row"}
@@ -87,5 +115,36 @@ const Dashboard = () => {
     </AdminLayout>
   );
 };
+const Widget = ({ title, value, Icon }) => (
+  <Paper
+    elevation={3}
+    sx={{
+      padding: "2rem",
+      borderRadius: "1.5rem",
+      width: "20rem",
+    }}
+  >
+    <Stack alignItems={"center"} spacing={"1rem"}>
+      <Typography
+        sx={{
+          color: "rgba(0,0,0,0.7)",
+          borderRadius: "50%",
+          border: "5px solid rgba(0,0,0,0.9)",
+          width: "5rem",
+          height: "5rem",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        {value}
+      </Typography>
 
+      <Stack direction={"row"} alignItems={"center"} spacing={"1rem"}>
+        {Icon}
+        <Typography>{title}</Typography>
+      </Stack>
+    </Stack>
+  </Paper>
+);
 export default Dashboard;
