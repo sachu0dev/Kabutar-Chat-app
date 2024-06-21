@@ -1,5 +1,33 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import AdminLayout from "../layout/AdminLayout";
+import Table from "../shared/Table";
+import { DashboardData } from "../../constants/sampleData";
+import { fileFormat, transformImage } from "../../lib/features";
+import moment from "moment";
+import { Avatar, Box, Stack } from "@mui/material";
+import renderAttachment from "../../components/shared/renderAttachment";
+
+interface Attachment {
+  public_id: string;
+  url: string;
+}
+
+interface Sender {
+  _id: string;
+  name: string;
+  avatar: string;
+}
+
+interface Message {
+  _id: string;
+  attachments: Attachment[];
+  content: string;
+  sender: Sender;
+  chat: string;
+  groupChat: boolean;
+  createdAt: string;
+}
+
 const columns = [
   {
     field: "id",
@@ -12,9 +40,32 @@ const columns = [
     headerName: "Attachments",
     headerClassName: "table-header",
     width: 200,
-    renderCell: (params) => (
-      <Avatar alt={params.row.name} src={params.row.avatar} />
-    ),
+    renderCell: (params: { row: Message }) => {
+      const { attachment } = params.row;
+      return attachment?.length > 0 ? (
+        <Stack direction="row" spacing={1}>
+          {attachment.map((i) => {
+            const url = i.url;
+            const file = fileFormat(url);
+            return (
+              <Box key={i.public_id}>
+                <a
+                  href={url}
+                  download
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: "black" }}
+                >
+                  {renderAttachment(url, file)}
+                </a>
+              </Box>
+            );
+          })}
+        </Stack>
+      ) : (
+        "No Attachments"
+      );
+    },
   },
   {
     field: "content",
@@ -27,12 +78,15 @@ const columns = [
     headerName: "Sent By",
     headerClassName: "table-header",
     width: 200,
-    renderCell: (params) => (
-      <Stack>
-        <Avatar alt={params.row.sender.name} src={params.row.sender.avatar} />
-        <span>{params.row.sender.name}</span>
-      </Stack>
-    ),
+    renderCell: (params: { row: Message }) => {
+      const { sender } = params.row;
+      return (
+        <Stack>
+          <Avatar alt={sender.name} src={sender.avatar} />
+          <span>{sender.name}</span>
+        </Stack>
+      );
+    },
   },
   {
     field: "chat",
@@ -55,9 +109,30 @@ const columns = [
 ];
 
 const MessageManagement = () => {
+  const [rows, setRows] = useState<Message[]>([]);
+
+  useEffect(() => {
+    setRows(
+      DashboardData.messages.map((message: Message) => ({
+        ...message,
+        id: message._id,
+        sender: {
+          ...message.sender,
+          avatar: transformImage(message.sender.avatar, 50),
+        },
+        createdAt: moment(message.createdAt).format("MMMM Do YYYY, h:mm:ss a"),
+      }))
+    );
+  }, []);
+
   return (
     <AdminLayout>
-      <div>MessageManagement</div>
+      <Table
+        heading={"All Messages"}
+        rows={rows}
+        columns={columns}
+        rowHeight={200}
+      />
     </AdminLayout>
   );
 };
