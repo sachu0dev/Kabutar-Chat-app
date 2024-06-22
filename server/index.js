@@ -2,6 +2,7 @@ import express from "express";
 import userRouter from "./routes/user.js";
 import 'dotenv/config'
 import { connectDB } from "./utils/featurns.js";
+import { errorMiddleware } from "./middlewares/error.js";
 
 
 
@@ -18,6 +19,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/v1/user", userRouter);
 
+app.use(errorMiddleware)
 app.listen(port, () => {
   console.log("Server started on port 3000");
 });
