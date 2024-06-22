@@ -2,6 +2,7 @@ import React, { memo } from "react";
 import { Link } from "../styles/StyledComponents";
 import { Box, Stack, Typography } from "@mui/material";
 import AvatarCard from "./AvatarCard";
+import { grayColor } from "../../constants/color";
 
 const ChatItem = ({
   avatar = [],
@@ -40,12 +41,21 @@ const ChatItem = ({
             <Typography>{newMessageAlert.count} New Message</Typography>
           )}
         </Stack>
-        {isOnline && (
+        {isOnline ? (
           <Box
             sx={{
               width: "0.5rem",
               height: "0.5rem",
               bgcolor: "green",
+              borderRadius: "50%",
+            }}
+          />
+        ) : (
+          <Box
+            sx={{
+              width: "0.5rem",
+              height: "0.5rem",
+              bgcolor: "gray",
               borderRadius: "50%",
             }}
           />
