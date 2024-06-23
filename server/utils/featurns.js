@@ -18,8 +18,8 @@ const connectDB = (url) => {
   });
 };
 const sendToken = (res,  user, statusCode, message) => {
-  const token = jwt.sign({ username: user.username }, process.env.JWT_SECRET)
-  console.log("Authenticated: " + user.username + " mode: Token");
+  const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET)
+  console.log("Authenticated: " + user._id + " mode: Token");
   return res.status(statusCode).cookie("token", token, cookieOptions).json({
     success: true,
     message
@@ -27,4 +27,10 @@ const sendToken = (res,  user, statusCode, message) => {
 }
 
 
-export { connectDB, sendToken }
+const emitEvent = (req, event, users, data)=> {
+  console.log("emitEvent: " + event);
+
+}
+
+
+export { connectDB, sendToken, cookieOptions, emitEvent }
