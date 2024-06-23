@@ -28,7 +28,7 @@ const sendToken = (res,  user, statusCode, message) => {
 
 
 const emitEvent = (req, event, users, data)=> {
-  console.log("emitEvent: " + event);
+  console.log("emitEvent: " + event );
 
 }
 
