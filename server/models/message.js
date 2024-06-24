@@ -1,32 +1,32 @@
-import mongoose , {Schema, model} from "mongoose";
-
-
+import mongoose, { Schema, Types } from "mongoose";
 
 const schema = new Schema({
-  content: String,
-  attachments: {
+  content: {
+    type: String,
+    required: false,
+  },
+  attachments: [{
     public_id: {
-      tyle: String,
-      required: true
+      type: String, 
+      required: true,
     },
     url: {
       type: String,
-      required: true
-    }
-  },
+      required: true,
+    },
+  }],
   sender: {
     type: Types.ObjectId,
     ref: "User",
-    requried: true
+    required: true, 
   },
   chat: {
     type: Types.ObjectId,
     ref: "Chat",
-    requried: true
+    required: true,
   },
-},{
-  timestamps: true
+}, {
+  timestamps: true,
 });
 
-
-export const Message = mongoose.models.Message ||  model("Message", schema)
+export const Message = mongoose.models.Message || mongoose.model("Message", schema); 

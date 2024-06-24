@@ -32,5 +32,9 @@ const emitEvent = (req, event, users, data)=> {
 
 }
 
+const deleteFilesFromCloud  = (public_ids) =>{
+  console.log(public_ids);
+}
 
-export { connectDB, sendToken, cookieOptions, emitEvent }
+
+export { connectDB, sendToken, cookieOptions, emitEvent, deleteFilesFromCloud }
