@@ -1,6 +1,7 @@
 import express from "express";
 import userRouter from "./routes/user.js";
 import chatRouter from "./routes/chat.js";
+import adminRouter from "./routes/admin.js";
 import 'dotenv/config'
 import { connectDB } from "./utils/featurns.js";
 import { errorMiddleware } from "./middlewares/error.js";
@@ -31,6 +32,8 @@ app.get("/", (req, res) => {
 
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/chat", chatRouter);
+app.use("/api/v1/admin", adminRouter);
+
 
 app.use(errorMiddleware)
 app.listen(port, () => {

@@ -1,12 +1,13 @@
 import { compare } from 'bcrypt';
-import { User } from '../models/user.js';
-import { emitEvent, sendToken } from '../utils/featurns.js';
+import { NEW_REQUEST, REFETCH_CHATS } from '../constants/events.js';
+import { acceptRequestSchema, loginSchema, searchUserSchema, sendRequestSchema, signUpSchema } from '../lib/validators.js';
 import { TryCatch } from '../middlewares/error.js';
-import { ErrorHandler } from '../utils/utility.js';
-import { accpectRequestSchema, loginSchema, searchUserSchema, sendRequestSchema, signUpSchema } from '../lib/validators.js';
 import { Chat } from '../models/chat.js';
 import { Request } from '../models/request.js';
-import { NEW_REQUEST, REFETCH_CHATS } from '../constants/events.js';
+import { User } from '../models/user.js';
+import { emitEvent, sendToken } from '../utils/featurns.js';
+import { ErrorHandler } from '../utils/utility.js';
+import { getOtherMembers } from '../lib/helper.js';
 ;
 
 const newUser = TryCatch(async (req, res, next) => {
@@ -129,50 +130,131 @@ const sendRequest = TryCatch(async (req, res, next) => {
   })
 })
 
-const accpectRequest = TryCatch(async (req, res, next) => {
+const acceptRequest = TryCatch(async (req, res, next) => {
+  const { requestId, accept } = req.body;
 
-  const { requestId, accpect } = req.body;
 
-  const isValidInput = accpectRequestSchema.safeParse({ requestId, accpect });
+  const isValidInput = acceptRequestSchema.safeParse({ requestId, accept });
 
   if (!isValidInput.success) {
-    const errorMessages = accpectRequestSchema.error.issues.map(issue => issue.message).join(", ");
+    const errorMessages = isValidInput.error.issues.map(issue => issue.message).join(", ");
     return next(new ErrorHandler(errorMessages, 400));
   }
 
-  const request = await Request.findById(requestId).populate("sender", "name").populate("receiver", "name");
+  const request = await Request.findById(requestId)
+    .populate("sender", "name")
+    .populate("receiver", "name");
 
-  if(!request) return next(new ErrorHandler("Request not found", 404));
-  if(request.receiver._id.toString() !== req.user.toString()) return next(new ErrorHandler("You are not authorized to accept this request", 401));
+  if (!request) {
+    return next(new ErrorHandler("Request not found", 404));
+  }
 
-  if(!accpect){
-    await Request.deleteOne(requestId);
+  if (!request.receiver) {
+    return next(new ErrorHandler("Request receiver not found", 404));
+  }
+
+  if (!req.user) {
+    return next(new ErrorHandler("User not authenticated", 401));
+  }
+
+  if (request.receiver._id.toString() !== req.user.toString()) {
+    return next(new ErrorHandler("You are not authorized to accept this request", 401));
+  }
+
+  if (!accept) {
+    await Request.deleteOne({ _id: requestId });
     return res.status(200).json({
       success: true,
-      message: "Request rejected"
-    })
+      message: "Request rejected",
+    });
   }
-  
+
   const members = [request.sender._id, request.receiver._id];
+
+  const chat = await Chat.findOne({
+    members: members
+  });
+
+  if (chat) {
+    await  Request.deleteOne({ _id: requestId });
+    return res.status(200).json({
+      success: true,
+      message: "Friend request accepted",
+      senderId: request.sender._id,
+    });
+  }
 
   await Promise.all([
     Chat.create({
       members,
       name: `${request.sender.name} and ${request.receiver.name}`,
-    })
-    , 
-    Request.deleteOne(requestId)
-  ])
+    }),
+    Request.deleteOne({ _id: requestId })
+  ]);
 
-  emitEvent(req, REFETCH_CHATS, members)
- 
+  emitEvent(req, REFETCH_CHATS, members);
+
   return res.status(200).json({
     success: true,
     message: "Friend request accepted",
     senderId: request.sender._id,
+  });
+});
+
+
+const getAllnotification = TryCatch(async (req, res, next) => {
+  const request = await Request.find({receiver: req.user}).populate("sender", "name avatar");
+
+  const allRequests = request.map(({sender, _id})=> ({  
+    _id,
+   sender: {
+    name: sender.name,
+    _id: sender._id,
+    avatar: sender.avatar.url
+   }
+  }))
+
+  return res.status(200).json({
+    success: true,
+    allRequests
   })
 })
 
 
+const getAllFriends = TryCatch(async (req, res, next) => {
 
-export { login, newUser, getMyprofile , logout, searchUser, sendRequest, accpectRequest}
+
+  const chatId = req.query.chatId;
+
+  const chat = await Chat.find({members: req.user, groupChat: false}).populate("members", "name avatar");
+
+  const friends = chat.map(({members})=> {
+    const otherUser= getOtherMembers(members, req.user)
+
+    return {
+      _id: otherUser._id,
+      name: otherUser.name,
+      avatar: otherUser.avatar.url
+    }
+  })
+
+  if(chatId) {
+    const chat = await Chat.findById(chatId).populate("members", "name avatar");
+    const availableFriends = friends.filter((friends)=> !chat.members.includes(friends._id))
+
+    return res.status(200).json({
+      success: true,
+      friends: availableFriends
+    })
+  } else {
+
+    return res.status(200).json({
+      success: true,
+      friends
+    })
+  }
+ 
+ 
+})
+
+export { acceptRequest, getAllnotification, getMyprofile, login, logout, newUser, searchUser, sendRequest , getAllFriends};
