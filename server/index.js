@@ -5,7 +5,8 @@ import 'dotenv/config'
 import { connectDB } from "./utils/featurns.js";
 import { errorMiddleware } from "./middlewares/error.js";
 import cookie from "cookie-parser";
-import { createUser } from "./seeders/user.js";
+import { createMessagesInChat, createSampleChats, createSampleGroupChats } from "./seeders/chat.js";
+
 
 
 const app = express();
@@ -16,7 +17,13 @@ app.use(cookie());
 const port = process.env.PORT || 3000;
 connectDB(process.env.MONGO_URI);
 
-// createUser(20)
+
+// seeders
+// createSampleChats(10);
+// createSampleGroupChats(10);
+
+// createMessagesInChat("667a601580c777ca7f262ff8", 60)
+
 
 app.get("/", (req, res) => {
   res.send("Hello World!");

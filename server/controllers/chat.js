@@ -1,15 +1,21 @@
-import { TryCatch } from "../middlewares/error.js";
-import { ErrorHandler } from "../utils/utility.js";
-import { Chat } from "../models/chat.js";
-import { deleteFilesFromCloud, emitEvent } from "../utils/featurns.js";
 import { ALERT, NEW_ATTACHMENT, NEW_MESSAGE, REFETCH_CHATS } from "../constants/events.js";
 import { getOtherMembers } from "../lib/helper.js";
-import { User } from '../models/user.js';
+import { addMembersSchema, chatIdSchema, newGroupSchema, removeMembersSchema } from "../lib/validators.js";
+import { TryCatch } from "../middlewares/error.js";
+import { Chat } from "../models/chat.js";
 import { Message } from '../models/message.js';
+import { User } from '../models/user.js';
+import { deleteFilesFromCloud, emitEvent } from "../utils/featurns.js";
+import { ErrorHandler } from "../utils/utility.js";
 
 const newGroupChat = TryCatch(async (req, res, next) => {
   const { name, members } = req.body;
 
+  const isValidInput = newGroupSchema.safeParse({ name, members });
+  if (!isValidInput.success) {
+    const errorMessages = isValidInput.error.issues.map(issue => issue.message).join(", ");
+    return next(new ErrorHandler(errorMessages, 400));
+  }
   if (members.length < 2) {
     return next(new ErrorHandler("Minimum 2 members are required", 400));
   }
@@ -83,6 +89,12 @@ const getMyGroups = TryCatch(async (req, res, next) => {
 const addMembers = TryCatch(async (req, res, next) => {
   const { chatId, members } = req.body;
 
+  const isValidInput = addMembersSchema.safeParse({ name, members });
+  if (!isValidInput.success) {
+    const errorMessages = isValidInput.error.issues.map(issue => issue.message).join(", ");
+    return next(new ErrorHandler(errorMessages, 400));
+  }
+
   const chat = await Chat.findById(chatId);
 
   if (!members || members.length < 1) return next(new ErrorHandler("Please provide members", 400));
@@ -121,6 +133,10 @@ const addMembers = TryCatch(async (req, res, next) => {
 const removeMember = TryCatch(async (req, res, next) => {
   const { chatId, userId } = req.body;
 
+  const isValidInput = removeMembersSchema.safeParse({ chatId, userId });
+  if (!isValidInput.success) {
+    return next(new ErrorHandler(isValidInput.error.issues[0].message, 400));
+  }
 
   const [chat, userToBeRemoved] = await Promise.all([
     Chat.findById(chatId),
@@ -162,6 +178,11 @@ const removeMember = TryCatch(async (req, res, next) => {
 const leaveGroup = TryCatch(async (req, res, next) => {
   const chatId = req.params.id;
 
+  const isValidInput = chatIdSchema.safeParse({ chatId });
+  if (!isValidInput.success) {
+    return next(new ErrorHandler(isValidInput.error.issues[0].message, 400));
+  }
+
   const chat = await Chat.findById(chatId);
 
   if (!chat) return next(new ErrorHandler("Chat not found", 404));
@@ -198,6 +219,10 @@ const leaveGroup = TryCatch(async (req, res, next) => {
 
 const sendAttachment = TryCatch(async (req, res, next) => {
   const { chatId } = req.body;
+  const isValidInput = chatIdSchema.safeParse({ chatId });
+  if (!isValidInput.success) {
+    return next(new ErrorHandler(isValidInput.error.issues[0].message, 400));
+  }
   const [chat, user] = await Promise.all([
     Chat.findById(chatId),
     User.findById(req.user, "name") // Ensure `req.user._id` is used
@@ -343,5 +368,26 @@ const deleteChatDetails = TryCatch(async (req, res, next) => {
   });
 });
 
+const getMessages = TryCatch(async (req, res, next) => {
+  const chatId = req.params.id;
+  const { page = 1 } = req.query;
 
-export { newGroupChat, getMyChats, getMyGroups, addMembers , removeMember, leaveGroup , sendAttachment, getChatDetails, renameGroup, deleteChatDetails };
+  const limit = 20;
+  const skip = (page - 1) * limit;
+  const [messages, totalMessages] = await Promise.all([
+    Message.find({ chat: chatId }).sort({ createdAt: -1 }).skip(skip).limit(limit).populate("sender", "name")
+    .lean(),
+    Message.countDocuments({ chat: chatId }),
+  ])
+
+  const totalPages = Math.ceil(totalMessages / limit);
+
+  return res.status(200).json({
+    success: true,
+    messages: messages.reverse(),
+    totalPages
+  });
+})
+
+export { addMembers, deleteChatDetails, getChatDetails, getMessages, getMyChats, getMyGroups, leaveGroup, newGroupChat, removeMember, renameGroup, sendAttachment };
+
