@@ -219,6 +219,12 @@ const leaveGroup = TryCatch(async (req, res, next) => {
 
 const sendAttachment = TryCatch(async (req, res, next) => {
   const { chatId } = req.body;
+  const files = req.files || [];
+
+  if (files.length < 1) return next(new ErrorHandler("Please select an attachment", 400));
+
+  if(files.length > 5) return next(new ErrorHandler("You can only send up to 5 attachments at a time", 400));
+
   const isValidInput = chatIdSchema.safeParse({ chatId });
   if (!isValidInput.success) {
     return next(new ErrorHandler(isValidInput.error.issues[0].message, 400));
@@ -230,7 +236,6 @@ const sendAttachment = TryCatch(async (req, res, next) => {
 
   if (!chat) return next(new ErrorHandler("Chat not found", 404));
 
-  const files = req.files || [];
 
   if (files.length < 1) return next(new ErrorHandler("Please select an attachment", 400));
 

@@ -17,7 +17,12 @@ const avatar = {
   public_id: "Chaman",
   url: "https://res.cloudinary.com/dh1m1vq3d/image/upload/v1656813496/kabutar/avatar_chaman.jpg",
 }
+
+const file = req.file;
+
+if(!file) return next(new ErrorHandler("Please upload a file", 400))
 const isValidInput = signUpSchema.safeParse({ name, username, password, bio, avatar });
+
 if (!isValidInput.success) {
   const errorMessages = isValidInput.error.issues.map(issue => issue.message).join(", ");
   return next(new ErrorHandler(errorMessages, 400));

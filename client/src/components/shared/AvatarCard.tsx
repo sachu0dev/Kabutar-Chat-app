@@ -7,7 +7,7 @@ interface AvatarCardProps {
   max?: number;
 }
 
-const AvatarCard: React.FC<AvatarCardProps> = ({ avatar = [], max = 4 }) => {
+const AvatarCard: React.FC<AvatarCardProps> = ({ avatar = [], max = 2 }) => {
   return (
     <Stack direction={"row"} spacing={0.5} position={"relative"}>
       <AvatarGroup max={max}>

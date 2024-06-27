@@ -37,5 +37,5 @@ app.use("/api/v1/admin", adminRouter);
 
 app.use(errorMiddleware)
 app.listen(port, () => {
-  console.log("Server started on port 3000");
+  console.log("Server started on port: " + port + " in " + process.env.NODE_ENV + " mode");
 });
