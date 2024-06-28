@@ -1,4 +1,4 @@
-import { ALERT, NEW_ATTACHMENT, NEW_MESSAGE, REFETCH_CHATS } from "../constants/events.js";
+import { ALERT, NEW_ATTACHMENT, NEW_MESSAGE_ALERT, REFETCH_CHATS } from "../constants/events.js";
 import { getOtherMembers } from "../lib/helper.js";
 import { addMembersSchema, chatIdSchema, newGroupSchema, removeMembersSchema } from "../lib/validators.js";
 import { TryCatch } from "../middlewares/error.js";
@@ -145,7 +145,7 @@ const removeMember = TryCatch(async (req, res, next) => {
 
   if (!chat) return next(new ErrorHandler("Chat not found", 404));
 
-  if (!chat.groupChat) return next(new ErrorHandler("This is not a group chat", 400));
+  if (!chat.groupChat) return next(NEW_MESSAGE_ALERT, new ErrorHandler("This is not a group chat", 400));
 
   if (chat.creator.toString() !== req.user.toString()) {
     return next(new ErrorHandler("Only group chat creator can remove members", 400));
@@ -264,7 +264,7 @@ const sendAttachment = TryCatch(async (req, res, next) => {
     chatId
   });
 
-  emitEvent(req, NEW_MESSAGE, chat.members, {
+  emitEvent(req, NEW_MESSAGE_ALERT, chat.members, {
     chatId
   });
 
