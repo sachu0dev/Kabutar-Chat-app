@@ -13,6 +13,8 @@ import { useState } from "react";
 import { VisuallyHiddenInput } from "../components/styles/StyledComponents";
 import { useFileHandler, useInputValidation, useStrongPassword } from "6pp";
 import { usernameValdator } from "../utils/validators";
+import axios from "axios";
+import { server } from "../constants/config";
 function Login() {
   const [isLogin, setIsLogin] = useState(true);
 
@@ -26,12 +28,20 @@ function Login() {
     }
   });
 
+  const LoginUser = async ({ username, password }) => {
+    const response = await axios.post(server + "/user/login", {
+      username,
+      password,
+    });
+    console.log(response.data);
+  };
+
   const avatar = useFileHandler("single");
 
   const submitForm = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (isLogin) {
-      console.log({
+      LoginUser({
         username: username.value,
         password: password.value,
       });

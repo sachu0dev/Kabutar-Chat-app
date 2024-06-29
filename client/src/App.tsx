@@ -1,7 +1,11 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ProtectRoute from "./components/auth/ProtectRoute";
 import { LayoutLoader } from "./components/layout/Loaders";
+import axios from "axios";
+import { server } from "./constants/config.ts";
+import { useDispatch, useSelector } from "react-redux";
+import { userNotExist } from "./redux/reducers/auth.ts";
 
 const Home = lazy(() => import("./pages/Home"));
 const Login = lazy(() => import("./pages/Login"));
@@ -16,10 +20,19 @@ const MessageManagement = lazy(
   () => import("./components/admin/MessageManagement")
 );
 
-const user = true;
-
 const App = () => {
-  return (
+  const dispatch = useDispatch();
+  const { user, loader } = useSelector((state) => state.auth);
+  useEffect(() => {
+    axios
+      .get(`${server}/user/me`)
+      .then((res) => console.log(res))
+      .catch(() => dispatch(userNotExist()));
+  }, []);
+
+  return loader ? (
+    <LayoutLoader />
+  ) : (
     <BrowserRouter>
       <Suspense fallback={<LayoutLoader />}>
         <Routes>
@@ -35,7 +48,6 @@ const App = () => {
           <Route path="admin/users" element={<UserManagement />} />
           <Route path="admin/chats" element={<ChatManagement />} />
           <Route path="admin/messages" element={<MessageManagement />} />
-
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>

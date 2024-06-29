@@ -7,7 +7,9 @@ const isAuthenicated = TryCatch(async(req, res, next) => {
   if(!token) return next(new ErrorHandler("Please Login to access this resource", 401));
 
   const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
   req.user = decoded._id;
+
   next()
 })
 
