@@ -15,45 +15,79 @@ import { useFileHandler, useInputValidation, useStrongPassword } from "6pp";
 import { usernameValdator } from "../utils/validators";
 import axios from "axios";
 import { server } from "../constants/config";
+import { useDispatch } from "react-redux";
+import { userExists } from "../redux/reducers/auth";
+import { toast } from "react-hot-toast";
+
 function Login() {
   const [isLogin, setIsLogin] = useState(true);
+  const dispatch = useDispatch();
 
   const name = useInputValidation("");
   const bio = useInputValidation("");
   const username = useInputValidation("", usernameValdator);
-  // const password = useStrongPassword();
   const password = useInputValidation("", (password) => {
     if (password.length < 6) {
-      return { isValid: false, errorMessage: "password is too short" };
+      return { isValid: false, errorMessage: "Password is too short" };
     }
   });
 
-  const LoginUser = async ({ username, password }) => {
-    const response = await axios.post(server + "/user/login", {
-      username,
-      password,
-    });
-    console.log(response.data);
-  };
-
   const avatar = useFileHandler("single");
 
-  const submitForm = (e: React.FormEvent<HTMLFormElement>) => {
+  const submitFormLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (isLogin) {
-      LoginUser({
-        username: username.value,
-        password: password.value,
-      });
-    } else {
-      console.log({
-        name: name.value,
-        bio: bio.value,
-        username: username.value,
-        password: password.value,
-      });
+
+    const config = {
+      withCredentials: true,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+
+    try {
+      const { data } = await axios.post(
+        server + "/user/login",
+        {
+          username: username.value,
+          password: password.value,
+        },
+        config
+      );
+      dispatch(userExists(true));
+      toast.success(data.message);
+    } catch (error: any) {
+      console.log(error);
+      toast.error(error?.response?.data?.message || "Something went wrong");
     }
   };
+
+  const submitFormSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData();
+
+    formData.append("name", name.value);
+    formData.append("bio", bio.value);
+    formData.append("username", username.value);
+    formData.append("password", password.value);
+    formData.append("avatar", avatar.file);
+
+    const config = {
+      withCredentials: true,
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    };
+
+    try {
+      const { data } = await axios.post(server + "/user/new", formData, config);
+      dispatch(userExists(true));
+      toast.success(data.message);
+    } catch (error: any) {
+      console.log(error);
+      toast.error(error?.response?.data?.message || "Something went wrong");
+    }
+  };
+
   return (
     <div
       style={{
@@ -83,7 +117,10 @@ function Login() {
           {isLogin ? (
             <>
               <Typography variant="h5">Login</Typography>
-              <form style={{ width: "100%", marginTop: "1rem" }}>
+              <form
+                style={{ width: "100%", marginTop: "1rem" }}
+                onSubmit={submitFormLogin}
+              >
                 <TextField
                   required
                   fullWidth
@@ -133,7 +170,6 @@ function Login() {
                   color="primary"
                   type="submit"
                   fullWidth
-                  onClick={submitForm}
                 >
                   Login
                 </Button>
@@ -145,14 +181,17 @@ function Login() {
                   fullWidth
                   onClick={() => setIsLogin(false)}
                 >
-                  Dont't have an account? Signup
+                  Don't have an account? Signup
                 </Button>
               </form>
             </>
           ) : (
             <>
               <Typography variant="h5">Sign up</Typography>
-              <form style={{ width: "100%", marginTop: "1rem" }}>
+              <form
+                style={{ width: "100%", marginTop: "1rem" }}
+                onSubmit={submitFormSignUp}
+              >
                 <Stack position={"relative"} width={"10rem"} margin={"auto"}>
                   <Avatar
                     sx={{
@@ -253,7 +292,6 @@ function Login() {
                   color="primary"
                   type="submit"
                   fullWidth
-                  onClick={submitForm}
                 >
                   Signup
                 </Button>
@@ -265,7 +303,7 @@ function Login() {
                   fullWidth
                   onClick={() => setIsLogin(true)}
                 >
-                  Aready have an account? Login
+                  Already have an account? Login
                 </Button>
               </form>
             </>

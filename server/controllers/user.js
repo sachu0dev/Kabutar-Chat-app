@@ -5,7 +5,7 @@ import { TryCatch } from '../middlewares/error.js';
 import { Chat } from '../models/chat.js';
 import { Request } from '../models/request.js';
 import { User } from '../models/user.js';
-import { emitEvent, sendToken } from '../utils/featurns.js';
+import { emitEvent, sendToken, uploadFilesToCloud } from '../utils/featurns.js';
 import { ErrorHandler } from '../utils/utility.js';
 import { getOtherMembers } from '../lib/helper.js';
 ;
@@ -13,10 +13,7 @@ import { getOtherMembers } from '../lib/helper.js';
 const newUser = TryCatch(async (req, res, next) => {
 
   const { name, username, password, bio } = req.body;
-const avatar = {
-  public_id: "Chaman",
-  url: "https://res.cloudinary.com/dh1m1vq3d/image/upload/v1656813496/kabutar/avatar_chaman.jpg",
-}
+
 
 const file = req.file;
 
@@ -26,6 +23,13 @@ const isValidInput = signUpSchema.safeParse({ name, username, password, bio, ava
 if (!isValidInput.success) {
   const errorMessages = isValidInput.error.issues.map(issue => issue.message).join(", ");
   return next(new ErrorHandler(errorMessages, 400));
+}
+
+const result = uploadFilesToCloud([file])
+
+const avatar = {
+  public_id: result[0].public_id,
+  url: result[0].secure_url
 }
 const user = await User.create(isValidInput.data);
 console.log("User created: " + user._id );

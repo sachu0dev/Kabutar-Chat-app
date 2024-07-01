@@ -6,6 +6,7 @@ import { Server } from "socket.io";
 import { v4 as uuid } from "uuid";
 import mongoose from "mongoose";
 import cors from "cors";
+import {v2 as cloudinary} from "cloudinary";
 
 import { getSockets } from "./lib/helper.js";
 import { errorMiddleware } from "./middlewares/error.js";
@@ -15,6 +16,7 @@ import userRouter from "./routes/user.js";
 import { connectDB } from "./utils/featurns.js";
 import { NEW_MESSAGE, NEW_MESSAGE_ALERT } from "./constants/events.js";
 import { Message } from "./models/message.js";
+
 
 const app = express();
 const server = createServer(app);
@@ -39,7 +41,11 @@ app.use(cors({
 
 const port = process.env.PORT || 3000;
 connectDB(process.env.MONGO_URI);
-
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+})
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });
