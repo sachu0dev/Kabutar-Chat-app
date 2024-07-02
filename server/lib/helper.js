@@ -9,6 +9,6 @@ export const getSockets = (users = [])=> {
   return users.map((user)=> userSocketIDs.get(user._id)).toString()}
 
 
-  export const getBase64 = (file)=> {
-    return `data:${file.type};base64,${file.buffer.toString("base64")}`
-  }
+  export const getBase64 = (file) => {
+    return `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
+  };

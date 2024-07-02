@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import  jwt  from "jsonwebtoken";
 import  {v2 as cloudinary}  from 'cloudinary';
 import { v4 as uuid } from "uuid";
-import { getBase64 } from "../lib/helper";
+import { getBase64 } from "../lib/helper.js";
 const cookieOptions = {
   maxAge: 15 * 24 * 60 * 60 * 1000,
   sameSite: "none",
@@ -34,32 +34,34 @@ const emitEvent = (req, event, users, data)=> {
 
 }
 
-const uploadFilesToCloud = async (files=[]) => {
-  const uploadPromises = files.map((file)=> {
-    return new Promise((resolve, reject) => {
-      cloudinary.uploader.upload((getBase64(file)),{
-        resource_type: "auto",
-        public_id: uuid()
-      }, (error, result) => {
-        if(error) return reject(error);
-        resolve(result)
-      })
-    })
-  })
+const uploadFilesToCloud = async (files = []) => {
+  const uploadPromises = files.map(async (file) => {
+    try {
+      const base64File = getBase64(file);
+      return new Promise((resolve, reject) => {
+        cloudinary.uploader.upload(base64File, {
+          resource_type: "auto",
+          public_id: uuid()
+        }, (error, result) => {
+          if (error) return reject(error);
+          resolve(result);
+        });
+      });
+    } catch (error) {
+      throw new Error(`Error converting file to base64: ${error.message}`);
+    }
+  });
+
   try {
     const results = await Promise.all(uploadPromises);
-    const formattedResults = results.map((result)=> {
-      return {
-        public_id: result.public_id,
-        url: result.secure_url
-      }
-    })
-
-    return formattedResults
+    return results.map(result => ({
+      public_id: result.public_id,
+      url: result.secure_url
+    }));
   } catch (error) {
-    throw new Error("Error uploading files to Cloudinary", error);
+    throw new Error(`Error uploading files to Cloudinary: ${error.message}`);
   }
-}
+};
 
 const deleteFilesFromCloud  = (public_ids) =>{
   console.log(public_ids);
