@@ -31,7 +31,7 @@ const App = () => {
       .get(`${server}/user/me`, { withCredentials: true })
       .then((res) => dispatch(userExists(res.data.user)))
       .catch(() => dispatch(userNotExist()));
-  }, [dispatch]);
+  }, []);
 
   return loader ? (
     <LayoutLoader />

@@ -1,26 +1,54 @@
-import React from "react";
-import Header from "./Header";
-import Title from "../shared/Title";
-import { Grid } from "@mui/material";
-import ChatList from "../specific/ChatList";
-import { sampleChats } from "../../constants/sampleData";
+import { Drawer, Grid, Skeleton } from "@mui/material";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+import { useMyChatsQuery } from "../../redux/api/api";
+import { setIsMobile } from "../../redux/reducers/misc";
+import Title from "../shared/Title";
+import ChatList from "../specific/ChatList";
 import Profile from "../specific/Profile";
+import Header from "./Header";
+import toast from "react-hot-toast";
+import { useErrors } from "../../hooks/hook";
 
 const AppLayout = () => (WrappedComponent: React.FC) => {
   return (props) => {
     const params = useParams();
+    const dispatch = useDispatch();
 
     const chatId = params.chatId;
+
+    const { isMobile } = useSelector((state: RootState) => state.misc);
+
+    const { isLoading, data, isError, error, refetch } = useMyChatsQuery("");
+
+    useErrors([{ isError, error }]);
 
     const handleDeleteChat = (e, _id, groupChat) => {
       e.preventDefault();
       console.log(_id, groupChat);
     };
+
+    const handleMobile = () => dispatch(setIsMobile(true));
+    const handleCloseMobile = () => dispatch(setIsMobile(false));
+
     return (
       <>
         <Title title="chat" description="a chat app" />
         <Header />
+
+        {isLoading ? (
+          <Skeleton />
+        ) : (
+          <Drawer anchor="left" open={isMobile} onClose={handleCloseMobile}>
+            <ChatList
+              w="70vw"
+              chats={data.chats}
+              chatId={chatId}
+              handleDeleteChat={handleDeleteChat}
+            />
+          </Drawer>
+        )}
 
         <Grid container height={"calc(100vh - 4rem"}>
           <Grid
@@ -32,18 +60,15 @@ const AppLayout = () => (WrappedComponent: React.FC) => {
             }}
             height={"calc(100vh - 4rem"}
           >
-            <ChatList
-              chats={sampleChats}
-              chatId={chatId}
-              newMessagesAlert={[
-                {
-                  chatId,
-                  count: 4,
-                },
-              ]}
-              onlineUsers={["1", "2"]}
-              handleDeleteChat={handleDeleteChat}
-            />
+            {isLoading ? (
+              <Skeleton />
+            ) : (
+              <ChatList
+                chats={data.chats}
+                chatId={chatId}
+                handleDeleteChat={handleDeleteChat}
+              />
+            )}
           </Grid>
           <Grid item xs={12} sm={8} md={5} lg={6} height={"calc(100vh - 4rem)"}>
             <WrappedComponent {...props} />

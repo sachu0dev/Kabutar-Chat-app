@@ -1,4 +1,12 @@
 import {
+  Add as AddIcon,
+  Group as GroupIcon,
+  Logout as LogoutIcon,
+  Menu as MenuIcon,
+  Notifications as NotificationsIcon,
+  Search as SearchIcon,
+} from "@mui/icons-material";
+import {
   AppBar,
   Backdrop,
   Box,
@@ -7,45 +15,36 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { orange } from "../../constants/color";
-import {
-  Menu as MenuIcon,
-  Search as SearchIcon,
-  Add as AddIcon,
-  Group as GroupIcon,
-  Logout as LogoutIcon,
-  Notifications as NotificationsIcon,
-} from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
-import { lazy, Suspense, useState } from "react";
 import axios from "axios";
-import { server } from "../../constants/config";
+import { lazy, Suspense, useState } from "react";
 import toast from "react-hot-toast";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { orange } from "../../constants/color";
+import { server } from "../../constants/config";
+import { userNotExist } from "../../redux/reducers/auth";
+import { setIsMobile, setIsSearchMenu } from "../../redux/reducers/misc";
 
 const Search = lazy(() => import("../specific/Search"));
 const Notifications = lazy(() => import("../specific/Notifications"));
 const NewGroup = lazy(() => import("../specific/NewGroup"));
-import { useDispatch } from "react-redux";
-import { userExists } from "../../redux/reducers/auth";
 
 const Header = () => {
-  const [isMobile, setIsMobile] = useState(false);
-  const [isSearch, setIsSearch] = useState(false);
   const [isNewGroup, setIsNewGroup] = useState(false);
   const [isNotification, setIsNotification] = useState(false);
+  const { isSearchMenu } = useSelector((state: RootState) => state.misc);
 
   const dispatch = useDispatch();
 
   const navigate = useNavigate();
 
   const handleMobile = () => {
-    setIsMobile((prev) => !prev);
-    console.log("mobile");
+    dispatch(setIsMobile(true));
+    console.log("handleMobile");
   };
 
   const openSeachDialog = () => {
-    setIsSearch((prev) => !prev);
-    console.log("openSeachDialog");
+    dispatch(setIsSearchMenu(true));
   };
 
   const openNewGroup = () => {
@@ -68,7 +67,7 @@ const Header = () => {
         withCredentials: true,
       });
       toast.success(data.message);
-      dispatch(userExists(null));
+      dispatch(userNotExist());
       navigate("/login");
     } catch (error) {
       toast.error(error?.response?.data?.message || "Something went wrong");
@@ -125,7 +124,7 @@ const Header = () => {
         </AppBar>
       </Box>
 
-      {isSearch && (
+      {isSearchMenu && (
         <Suspense fallback={<Backdrop open />}>
           <Search />
         </Suspense>

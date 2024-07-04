@@ -18,8 +18,10 @@ import { server } from "../constants/config";
 import { useDispatch } from "react-redux";
 import { userExists } from "../redux/reducers/auth";
 import { toast } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 function Login() {
+  const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
   const dispatch = useDispatch();
 
@@ -53,8 +55,8 @@ function Login() {
         },
         config
       );
-      dispatch(userExists(true));
       toast.success(data.message);
+      window.location.reload();
     } catch (error: any) {
       console.log(error);
       toast.error(error?.response?.data?.message || "Something went wrong");
