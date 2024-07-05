@@ -7,8 +7,9 @@ import {
 import moment from "moment";
 import { useSelector } from "react-redux";
 import { RootState } from "@reduxjs/toolkit/query";
+import { transformImage } from "../../lib/features";
 const Profile = () => {
-  const { user, loader } = useSelector((state: RootState) => state.auth);
+  const { user } = useSelector((state: RootState) => state.auth);
   return (
     <Stack spacing={"2rem"} direction={"column"} alignItems={"center"}>
       <Avatar
@@ -19,7 +20,7 @@ const Profile = () => {
           marginBottom: "1rem",
           border: "5px solid white",
         }}
-        src={user?.avatar?.url}
+        src={transformImage(user?.avatar.url, 200)}
       ></Avatar>
       <ProfileCard heading={"Bio"} text={user?.bio} />
       <ProfileCard

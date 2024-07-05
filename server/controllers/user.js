@@ -16,24 +16,19 @@ const newUser = TryCatch(async (req, res, next) => {
   if (!file) return next(new ErrorHandler("Please upload a file", 400));
 
   const result = await uploadFilesToCloud([file]);
-  console.log(result);
   const avatar = {
     public_id: result[0].public_id,
     url: result[0].url
   };
-  console.log(avatar);
 
 
-  console.log("Reached here 1");
 
   const isValidInput = signUpSchema.safeParse({ name, username, password, bio,avatar });
 
-console.log(isValidInput.error);
   if (!isValidInput.success) {
     const errorMessages = isValidInput.error.issues.map(issue => issue.message).join(", ");
     return next(new ErrorHandler(errorMessages, 400));
   }
-  console.log("Reached here 3");
 
   const user = await User.create(isValidInput.data);
   console.log("User created: " + user._id);
@@ -61,7 +56,6 @@ const login = TryCatch(async (req, res, next) => {
 const getMyprofile = TryCatch(async (req, res, next) => {
   const user = await User.findById(req.user);
   if (!user) return next(new ErrorHandler("User not found", 404));
-  console.log(user);
   res.status(200).json({ success: true, user });
 });
 
@@ -162,7 +156,7 @@ const acceptRequest = TryCatch(async (req, res, next) => {
 
 const getAllnotification = TryCatch(async (req, res, next) => {
   const request = await Request.find({ receiver: req.user }).populate("sender", "name avatar");
-
+console.log(request);
   const allRequests = request.map(({ sender, _id }) => ({
     _id,
     sender: {

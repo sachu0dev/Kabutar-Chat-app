@@ -16,7 +16,10 @@ const schema = new Schema({
     required: true,
     select: false
   },
-  bio: String,
+  bio: {
+    type: String,
+    required: true,
+  },
   avatar: {
     public_id: {
       type: String,  // Fixed the typo from 'tyle' to 'type'

@@ -23,7 +23,11 @@ import { useNavigate } from "react-router-dom";
 import { orange } from "../../constants/color";
 import { server } from "../../constants/config";
 import { userNotExist } from "../../redux/reducers/auth";
-import { setIsMobile, setIsSearchMenu } from "../../redux/reducers/misc";
+import {
+  setIsMobile,
+  setIsNotification,
+  setIsSearchMenu,
+} from "../../redux/reducers/misc";
 
 const Search = lazy(() => import("../specific/Search"));
 const Notifications = lazy(() => import("../specific/Notifications"));
@@ -31,8 +35,9 @@ const NewGroup = lazy(() => import("../specific/NewGroup"));
 
 const Header = () => {
   const [isNewGroup, setIsNewGroup] = useState(false);
-  const [isNotification, setIsNotification] = useState(false);
-  const { isSearchMenu } = useSelector((state: RootState) => state.misc);
+  const { isSearchMenu, isNotification } = useSelector(
+    (state: RootState) => state.misc
+  );
 
   const dispatch = useDispatch();
 
@@ -52,10 +57,7 @@ const Header = () => {
     console.log("openNewGroup");
   };
 
-  const openNotification = () => {
-    setIsNotification((prev) => !prev);
-    console.log("openNotification");
-  };
+  const openNotification = () => dispatch(setIsNotification(true));
 
   const navigateToGroup = () => {
     navigate("/groups");
