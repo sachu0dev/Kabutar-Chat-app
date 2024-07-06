@@ -156,7 +156,6 @@ const acceptRequest = TryCatch(async (req, res, next) => {
 
 const getAllnotification = TryCatch(async (req, res, next) => {
   const request = await Request.find({ receiver: req.user }).populate("sender", "name avatar");
-console.log(request);
   const allRequests = request.map(({ sender, _id }) => ({
     _id,
     sender: {

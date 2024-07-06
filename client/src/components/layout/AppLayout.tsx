@@ -1,15 +1,15 @@
 import { Drawer, Grid, Skeleton } from "@mui/material";
-import React, { useEffect } from "react";
+import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+import { useErrors } from "../../hooks/hook";
 import { useMyChatsQuery } from "../../redux/api/api";
 import { setIsMobile } from "../../redux/reducers/misc";
 import Title from "../shared/Title";
 import ChatList from "../specific/ChatList";
 import Profile from "../specific/Profile";
 import Header from "./Header";
-import toast from "react-hot-toast";
-import { useErrors } from "../../hooks/hook";
+import { getSocket } from "../../socket";
 
 const AppLayout = () => (WrappedComponent: React.FC) => {
   return (props) => {
@@ -17,6 +17,9 @@ const AppLayout = () => (WrappedComponent: React.FC) => {
     const dispatch = useDispatch();
 
     const chatId = params.chatId;
+
+    const socket = getSocket();
+    console.log(socket);
 
     const { isMobile } = useSelector((state: RootState) => state.misc);
 

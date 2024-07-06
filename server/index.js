@@ -6,7 +6,7 @@ import { Server } from "socket.io";
 import { v4 as uuid } from "uuid";
 import mongoose from "mongoose";
 import cors from "cors";
-import {v2 as cloudinary} from "cloudinary";
+import { v2 as cloudinary } from "cloudinary";
 
 import { getSockets } from "./lib/helper.js";
 import { errorMiddleware } from "./middlewares/error.js";
@@ -16,36 +16,40 @@ import userRouter from "./routes/user.js";
 import { connectDB } from "./utils/featurns.js";
 import { NEW_MESSAGE, NEW_MESSAGE_ALERT } from "./constants/events.js";
 import { Message } from "./models/message.js";
+import cookieParser from "cookie-parser";
+import { socketAuthenticator } from "./middlewares/auth.js";
 
-
+// Setup
 const app = express();
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "*", // Adjust this according to your client origin
-    methods: ["GET", "POST"],
-    allowedHeaders: ["Content-Type"],
-    credentials: true
+    origin: ["http://localhost:5173", "http://localhost:4173", process.env.CLIENT_URL],
+    credentials: true,
+    methods: ["GET", "POST", "DELETE", "OPTIONS"],
   }
 });
 
 const userSocketIDs = new Map();
 
-// middlewares
+// Middlewares
 app.use(express.json());
 app.use(cookie());
 app.use(cors({
-  origin: ["http://localhost:5173","http://localhost:4173",process.env.CLIENT_URL],
+  origin: ["http://localhost:5173", "http://localhost:4173", process.env.CLIENT_URL],
   credentials: true,
-}))
+}));
 
 const port = process.env.PORT || 3000;
 connectDB(process.env.MONGO_URI);
+
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
-})
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+// Routes
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });
@@ -54,17 +58,18 @@ app.use("/api/v1/user", userRouter);
 app.use("/api/v1/chat", chatRouter);
 app.use("/api/v1/admin", adminRouter);
 
+// Socket.IO authentication
 io.use((socket, next) => {
-  // Perform any required middleware tasks
-  next(); // Ensure this is called
+  cookieParser()(socket.request, socket.request.res, async (err) => {
+    await socketAuthenticator(err, socket, next);
+  });
 });
 
+// Socket.IO connection
 io.on("connection", (socket) => {
-  const user = {
-    _id: new mongoose.Types.ObjectId(), // Generate a valid ObjectId
-    name: "sachin",
-  };
+  const user = socket.user;
   userSocketIDs.set(user._id.toString(), socket.id.toString());
+  console.log("Connected: " + socket.id);
 
   socket.on(NEW_MESSAGE, async ({ chatId, members, message }) => {
     const messageForRealTime = {
@@ -72,22 +77,22 @@ io.on("connection", (socket) => {
       _id: uuid(),
       sender: {
         _id: user._id,
-        name: user.name
+        name: user.name,
       },
       chat: chatId,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
     };
 
     const messageForDB = {
       content: message,
       sender: user._id,
-      chat: new mongoose.Types.ObjectId(chatId) // Ensure chatId is a valid ObjectId
+      chat: new mongoose.Types.ObjectId(chatId), // Ensure chatId is a valid ObjectId
     };
 
     const membersSockets = getSockets(members);
     io.to(membersSockets).emit(NEW_MESSAGE, {
       message: messageForRealTime,
-      chatId
+      chatId,
     });
 
     io.to(membersSockets).emit(NEW_MESSAGE_ALERT, { chatId });
@@ -105,8 +110,10 @@ io.on("connection", (socket) => {
   });
 });
 
+// Error Middleware
 app.use(errorMiddleware);
 
+// Start Server
 server.listen(port, () => {
   console.log("Server started on port: " + port + " in " + process.env.NODE_ENV + " mode");
 });
