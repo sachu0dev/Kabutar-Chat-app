@@ -19,7 +19,6 @@ const AppLayout = () => (WrappedComponent: React.FC) => {
     const chatId = params.chatId;
 
     const socket = getSocket();
-    console.log(socket);
 
     const { isMobile } = useSelector((state: RootState) => state.misc);
 
@@ -74,7 +73,7 @@ const AppLayout = () => (WrappedComponent: React.FC) => {
             )}
           </Grid>
           <Grid item xs={12} sm={8} md={5} lg={6} height={"calc(100vh - 4rem)"}>
-            <WrappedComponent {...props} />
+            <WrappedComponent {...props} chatId={chatId} />
           </Grid>
           <Grid
             item

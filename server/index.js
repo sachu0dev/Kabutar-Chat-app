@@ -1,4 +1,3 @@
-import cookie from "cookie-parser";
 import 'dotenv/config';
 import express from "express";
 import { createServer } from "http";
@@ -7,7 +6,6 @@ import { v4 as uuid } from "uuid";
 import mongoose from "mongoose";
 import cors from "cors";
 import { v2 as cloudinary } from "cloudinary";
-
 import { getSockets } from "./lib/helper.js";
 import { errorMiddleware } from "./middlewares/error.js";
 import adminRouter from "./routes/admin.js";
@@ -29,18 +27,18 @@ const io = new Server(server, {
     methods: ["GET", "POST", "DELETE", "OPTIONS"],
   }
 });
-
 const userSocketIDs = new Map();
 
 // Middlewares
 app.use(express.json());
-app.use(cookie());
+app.use(cookieParser());
 app.use(cors({
   origin: ["http://localhost:5173", "http://localhost:4173", process.env.CLIENT_URL],
   credentials: true,
 }));
 
 const port = process.env.PORT || 3000;
+
 connectDB(process.env.MONGO_URI);
 
 cloudinary.config({
@@ -53,7 +51,6 @@ cloudinary.config({
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });
-
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/chat", chatRouter);
 app.use("/api/v1/admin", adminRouter);
@@ -69,14 +66,13 @@ io.use((socket, next) => {
 io.on("connection", (socket) => {
   const user = socket.user;
   userSocketIDs.set(user._id.toString(), socket.id.toString());
-  console.log("Connected: " + socket.id);
 
   socket.on(NEW_MESSAGE, async ({ chatId, members, message }) => {
     const messageForRealTime = {
       content: message,
       _id: uuid(),
       sender: {
-        _id: user._id,
+        id: user._id,
         name: user.name,
       },
       chat: chatId,
@@ -86,15 +82,17 @@ io.on("connection", (socket) => {
     const messageForDB = {
       content: message,
       sender: user._id,
-      chat: new mongoose.Types.ObjectId(chatId), // Ensure chatId is a valid ObjectId
+      chat: new mongoose.Types.ObjectId(chatId),
     };
+    console.log("emitting", members);
 
     const membersSockets = getSockets(members);
+    console.log("members", membersSockets);
+
     io.to(membersSockets).emit(NEW_MESSAGE, {
       message: messageForRealTime,
       chatId,
     });
-
     io.to(membersSockets).emit(NEW_MESSAGE_ALERT, { chatId });
 
     try {
@@ -115,7 +113,7 @@ app.use(errorMiddleware);
 
 // Start Server
 server.listen(port, () => {
-  console.log("Server started on port: " + port + " in " + process.env.NODE_ENV + " mode");
+  console.log(`Server started on port: ${port} in ${process.env.NODE_ENV} mode`);
 });
 
 export { userSocketIDs };

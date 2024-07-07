@@ -1,13 +1,17 @@
-import React, { createContext, useMemo, useContext } from "react";
-import io from "socket.io-client";
+import React, { createContext, useMemo, useContext, ReactNode } from "react";
+import { io, Socket } from "socket.io-client";
 
-const SocketContext = createContext();
+const SocketContext = createContext<Socket | null>(null);
 
-const getSocket = () => {
+const getSocket = (): Socket | null => {
   return useContext(SocketContext);
 };
 
-const SocketProvider = ({ children }) => {
+interface SocketProviderProps {
+  children: ReactNode;
+}
+
+const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
   const socket = useMemo(() => {
     const socketInstance = io("http://localhost:3000", {
       withCredentials: true,
