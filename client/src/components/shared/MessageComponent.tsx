@@ -1,15 +1,12 @@
-import { withTheme } from "@emotion/react";
 import { Box, Typography } from "@mui/material";
-import React, { memo } from "react";
-import { grayColor, lightBlue } from "../../constants/color";
 import moment from "moment";
+import { memo } from "react";
+import { grayColor, lightBlue } from "../../constants/color";
 import { fileFormat } from "../../lib/features";
-import { render } from "react-dom";
 import renderAttachment from "./renderAttachment";
 
 const MessageComponent = ({ message, user }) => {
   const { sender, content, attachments = [], createdAt } = message;
-  console.log(sender);
 
   const sameSender = sender?._id == user?._id;
 

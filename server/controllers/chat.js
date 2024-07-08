@@ -220,7 +220,7 @@ const leaveGroup = TryCatch(async (req, res, next) => {
 const sendAttachment = TryCatch(async (req, res, next) => {
   const { chatId } = req.body;
   const files = req.files || [];
-  console.log(files);
+  // console.log(files);
 
   if (files.length < 1) return next(new ErrorHandler("Please select an attachment", 400));
 

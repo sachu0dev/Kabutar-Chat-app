@@ -48,7 +48,12 @@ const FileMenu = ({ anchorE1, chatId }) => {
       const responce = await sendAttchments(myForm);
       if (responce.data)
         toast.success("File uploaded successfully", { id: toastId });
-      else toast.error("Something went wrong", { id: toastId });
+      else {
+        toast.error(responce?.error?.data?.message || "Something went wrong", {
+          id: toastId,
+        });
+        console.log(responce);
+      }
     } catch (error) {
       toast.error(error, { id: toastId });
     } finally {

@@ -1,3 +1,8 @@
+import React, { lazy, Suspense, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
+import axios from "axios";
 import {
   Add as AddIcon,
   Group as GroupIcon,
@@ -9,17 +14,13 @@ import {
 import {
   AppBar,
   Backdrop,
+  Badge,
   Box,
   IconButton,
   Toolbar,
   Tooltip,
   Typography,
 } from "@mui/material";
-import axios from "axios";
-import { lazy, Suspense, useState } from "react";
-import toast from "react-hot-toast";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
 import { orange } from "../../constants/color";
 import { server } from "../../constants/config";
 import { userNotExist } from "../../redux/reducers/auth";
@@ -28,6 +29,10 @@ import {
   setIsNotification,
   setIsSearchMenu,
 } from "../../redux/reducers/misc";
+
+// Ensure RootState type is imported from your store configuration
+import { RootState } from "../../redux/store";
+import { resetNotificationCount } from "../../redux/reducers/chat";
 
 const Search = lazy(() => import("../specific/Search"));
 const Notifications = lazy(() => import("../specific/Notifications"));
@@ -38,9 +43,9 @@ const Header = () => {
   const { isSearchMenu, isNotification } = useSelector(
     (state: RootState) => state.misc
   );
+  const { notificationCount } = useSelector((state: RootState) => state.chat);
 
   const dispatch = useDispatch();
-
   const navigate = useNavigate();
 
   const handleMobile = () => {
@@ -48,7 +53,7 @@ const Header = () => {
     console.log("handleMobile");
   };
 
-  const openSeachDialog = () => {
+  const openSearchDialog = () => {
     dispatch(setIsSearchMenu(true));
   };
 
@@ -57,8 +62,10 @@ const Header = () => {
     console.log("openNewGroup");
   };
 
-  const openNotification = () => dispatch(setIsNotification(true));
-
+  const openNotification = () => {
+    dispatch(setIsNotification(true));
+    dispatch(resetNotificationCount());
+  };
   const navigateToGroup = () => {
     navigate("/groups");
   };
@@ -99,7 +106,7 @@ const Header = () => {
               <IconBtn
                 title="Search"
                 icon={<SearchIcon />}
-                onClick={openSeachDialog}
+                onClick={openSearchDialog}
               />
               <IconBtn
                 title="New Group"
@@ -115,6 +122,7 @@ const Header = () => {
                 title="Notification"
                 icon={<NotificationsIcon />}
                 onClick={openNotification}
+                value={notificationCount}
               />
               <IconBtn
                 title="Logout"
@@ -147,13 +155,20 @@ const Header = () => {
   );
 };
 
-const IconBtn = ({ title, icon, onClick }) => {
+const IconBtn = ({ title, icon, onClick, value }) => {
   return (
     <Tooltip title={title}>
       <IconButton color="inherit" size="large" onClick={onClick}>
-        {icon}
+        {value > 0 ? (
+          <Badge badgeContent={value} color="error">
+            {icon}
+          </Badge>
+        ) : (
+          icon
+        )}
       </IconButton>
     </Tooltip>
   );
 };
+
 export default Header;

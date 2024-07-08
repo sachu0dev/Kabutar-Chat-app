@@ -7,7 +7,7 @@ const ChatList = ({
   chats = [],
   chatId,
   onlineUsers = [],
-  newMessagesAlert = [],
+  newMessageAlert = [],
   handleDeleteChat,
 }) => {
   return (
@@ -19,13 +19,13 @@ const ChatList = ({
     >
       {chats.map((data, index) => {
         const { avatar, name, _id, groupChat, members } = data;
-        const newMessageAlert = newMessagesAlert.find(
+        const newMessagesAlert = newMessageAlert.find(
           ({ chatId }) => chatId === _id
         );
         const isOnline = members.some((member) => onlineUsers.includes(member));
         return (
           <ChatItem
-            newMessageAlert={newMessageAlert}
+            newMessageAlert={newMessagesAlert}
             isOnline={isOnline}
             avatar={avatar}
             name={name}

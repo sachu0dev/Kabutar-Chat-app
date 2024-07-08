@@ -1,8 +1,8 @@
 import { Drawer, Grid, Skeleton } from "@mui/material";
-import React from "react";
+import React, { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import { useErrors } from "../../hooks/hook";
+import { useErrors, useSocketEvents } from "../../hooks/hook";
 import { useMyChatsQuery } from "../../redux/api/api";
 import { setIsMobile } from "../../redux/reducers/misc";
 import Title from "../shared/Title";
@@ -10,9 +10,15 @@ import ChatList from "../specific/ChatList";
 import Profile from "../specific/Profile";
 import Header from "./Header";
 import { getSocket } from "../../socket";
+import { NEW_MESSAGE_ALERT, NEW_REQUEST } from "../../constants/events";
+import {
+  incrementNotificationCount,
+  setNewMessageAlert,
+} from "../../redux/reducers/chat";
 
 const AppLayout = () => (WrappedComponent: React.FC) => {
   return (props) => {
+    useSocketEvents;
     const params = useParams();
     const dispatch = useDispatch();
 
@@ -22,6 +28,8 @@ const AppLayout = () => (WrappedComponent: React.FC) => {
 
     const { isMobile } = useSelector((state: RootState) => state.misc);
     const { user } = useSelector((state: RootState) => state.auth);
+    const { newMessageAlert } = useSelector((state: RootState) => state.chat);
+    console.log(newMessageAlert, "newMessageAlert");
 
     const { isLoading, data, isError, error, refetch } = useMyChatsQuery("");
 
@@ -34,6 +42,25 @@ const AppLayout = () => (WrappedComponent: React.FC) => {
 
     const handleMobile = () => dispatch(setIsMobile(true));
     const handleCloseMobile = () => dispatch(setIsMobile(false));
+    const newMessagesAlertHandler = useCallback(
+      (data) => {
+        if (data.chatId === chatId) return;
+        dispatch(setNewMessageAlert(data));
+        const sds = data.chatId;
+        console.log("newMessage", sds);
+      },
+      [chatId]
+    );
+    const newRequestHandler = useCallback(() => {
+      dispatch(incrementNotificationCount());
+    }, [dispatch]);
+
+    const eventHandlers = {
+      [NEW_MESSAGE_ALERT]: newMessagesAlertHandler,
+      [NEW_REQUEST]: newRequestHandler,
+    };
+
+    useSocketEvents(socket, eventHandlers);
 
     return (
       <>
@@ -49,6 +76,7 @@ const AppLayout = () => (WrappedComponent: React.FC) => {
               chats={data.chats}
               chatId={chatId}
               handleDeleteChat={handleDeleteChat}
+              newMessageAlert={newMessageAlert}
             />
           </Drawer>
         )}
@@ -70,6 +98,7 @@ const AppLayout = () => (WrappedComponent: React.FC) => {
                 chats={data.chats}
                 chatId={chatId}
                 handleDeleteChat={handleDeleteChat}
+                newMessageAlert={newMessageAlert}
               />
             )}
           </Grid>

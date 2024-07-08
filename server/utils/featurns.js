@@ -35,7 +35,6 @@ const emitEvent = (req, event, users, data) => {
     if (!io) throw new Error("Socket.io instance not found");
 
     const userSockets = getSockets(users);
-    console.log(userSockets);
     if (userSockets.length === 0) {
       console.warn(`No valid socket IDs found for event ${event} and users: ${users.join(", ")}`);
       return;
