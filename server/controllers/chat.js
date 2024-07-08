@@ -1,11 +1,11 @@
-import { ALERT, NEW_ATTACHMENT, NEW_MESSAGE_ALERT, REFETCH_CHATS } from "../constants/events.js";
+import { ALERT, NEW_MESSAGE, NEW_MESSAGE_ALERT, REFETCH_CHATS } from "../constants/events.js";
 import { getOtherMembers } from "../lib/helper.js";
 import { addMembersSchema, chatIdSchema, newGroupSchema, removeMembersSchema } from "../lib/validators.js";
 import { TryCatch } from "../middlewares/error.js";
 import { Chat } from "../models/chat.js";
 import { Message } from '../models/message.js';
 import { User } from '../models/user.js';
-import { deleteFilesFromCloud, emitEvent } from "../utils/featurns.js";
+import { deleteFilesFromCloud, emitEvent, uploadFilesToCloud } from "../utils/featurns.js";
 import { ErrorHandler } from "../utils/utility.js";
 
 const newGroupChat = TryCatch(async (req, res, next) => {
@@ -108,7 +108,7 @@ const addMembers = TryCatch(async (req, res, next) => {
   const allNewMembersPromise = members.map((id) => User.findById(id, "name"));
   const allNewMembers = await Promise.all(allNewMembersPromise);
 
-  const newMemberIds = allNewMembers.map((member) => member._id.toString());
+  const newMemberIds = allNewMembers.map((member) => member._id.toNEW_MESSAGEString());
 
   const uniqueNewMembers = allNewMembers.filter((member) => !chat.members.some((existingMember) => existingMember.toString() === member._id.toString()));
 
@@ -220,6 +220,7 @@ const leaveGroup = TryCatch(async (req, res, next) => {
 const sendAttachment = TryCatch(async (req, res, next) => {
   const { chatId } = req.body;
   const files = req.files || [];
+  console.log(files);
 
   if (files.length < 1) return next(new ErrorHandler("Please select an attachment", 400));
 
@@ -240,14 +241,14 @@ const sendAttachment = TryCatch(async (req, res, next) => {
   if (files.length < 1) return next(new ErrorHandler("Please select an attachment", 400));
 
   // Upload files and process attachments
-  const attachments = []
+  const attachments = await uploadFilesToCloud(files)
 
  
   const dbMessage = {
-    content: "f",
+    content: "",
     attachments,
     sender: user._id,
-    chat: chatId // corrected the field name to `chat`
+    chat: chatId
   };
   const realTimeMessage = {
     ...dbMessage,
@@ -259,7 +260,7 @@ const sendAttachment = TryCatch(async (req, res, next) => {
 
   const message = await Message.create(dbMessage);
 
-  emitEvent(req, NEW_ATTACHMENT, chat.members, {
+  emitEvent(req, NEW_MESSAGE, chat.members, {
     message: realTimeMessage,
     chatId
   });

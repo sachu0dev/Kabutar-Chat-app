@@ -21,6 +21,7 @@ const AppLayout = () => (WrappedComponent: React.FC) => {
     const socket = getSocket();
 
     const { isMobile } = useSelector((state: RootState) => state.misc);
+    const { user } = useSelector((state: RootState) => state.auth);
 
     const { isLoading, data, isError, error, refetch } = useMyChatsQuery("");
 
@@ -73,7 +74,7 @@ const AppLayout = () => (WrappedComponent: React.FC) => {
             )}
           </Grid>
           <Grid item xs={12} sm={8} md={5} lg={6} height={"calc(100vh - 4rem)"}>
-            <WrappedComponent {...props} chatId={chatId} />
+            <WrappedComponent {...props} chatId={chatId} user={user} />
           </Grid>
           <Grid
             item

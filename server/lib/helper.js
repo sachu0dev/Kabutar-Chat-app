@@ -6,10 +6,21 @@ export const getOtherMembers = (members, userId)=> {
 
 
 export const getSockets = (users = []) => {
-  const sockets = users.map((user)=> userSocketIDs.get(user).toString())
+  const sockets = users.map((user) => {
+    const userId = user.toString(); // Convert ObjectId to string
+    console.log(userId);
+    const socketId = userSocketIDs.get(userId);
+    if (!socketId) {
+      console.warn(`Socket ID not found for user: ${userId}`);
+      return null;
+    }
+    return socketId.toString();
+  }).filter(socketId => socketId); // Filter out null values
 
-  return sockets
+  return sockets;
 };
+
+
 
 
   export const getBase64 = (file) => {

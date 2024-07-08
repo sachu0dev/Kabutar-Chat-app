@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import  jwt  from "jsonwebtoken";
 import  {v2 as cloudinary}  from 'cloudinary';
 import { v4 as uuid } from "uuid";
-import { getBase64 } from "../lib/helper.js";
+import { getBase64, getSockets } from "../lib/helper.js";
 const cookieOptions = {
   maxAge: 15 * 24 * 60 * 60 * 1000,
   sameSite: "none",
@@ -29,10 +29,27 @@ const sendToken = (res,  user, statusCode, message) => {
 }
 
 
-const emitEvent = (req, event, users, data)=> {
-  console.log("emitEvent: " + event );
+const emitEvent = (req, event, users, data) => {
+  try {
+    const io = req.app.get("io");
+    if (!io) throw new Error("Socket.io instance not found");
 
-}
+    const userSockets = getSockets(users);
+    console.log(userSockets);
+    if (userSockets.length === 0) {
+      console.warn(`No valid socket IDs found for event ${event} and users: ${users.join(", ")}`);
+      return;
+    }
+
+    io.to(userSockets).emit(event, data);
+    console.log(`Event ${event} emitted to users: ${users.join(", ")}`);
+  } catch (error) {
+    console.error(`Failed to emit event ${event}:`, error);
+  }
+};
+
+
+
 
 const uploadFilesToCloud = async (files = []) => {
   const uploadPromises = files.map(async (file) => {

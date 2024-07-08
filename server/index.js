@@ -27,6 +27,8 @@ const io = new Server(server, {
     methods: ["GET", "POST", "DELETE", "OPTIONS"],
   }
 });
+
+app.set("io", io)
 const userSocketIDs = new Map();
 
 // Middlewares
@@ -65,6 +67,8 @@ io.use((socket, next) => {
 // Socket.IO connection
 io.on("connection", (socket) => {
   const user = socket.user;
+
+  console.log("Connected: " + user.name);
   userSocketIDs.set(user._id.toString(), socket.id.toString());
 
   socket.on(NEW_MESSAGE, async ({ chatId, members, message }) => {
@@ -72,7 +76,7 @@ io.on("connection", (socket) => {
       content: message,
       _id: uuid(),
       sender: {
-        id: user._id,
+        _id: user._id,
         name: user.name,
       },
       chat: chatId,
@@ -84,10 +88,8 @@ io.on("connection", (socket) => {
       sender: user._id,
       chat: new mongoose.Types.ObjectId(chatId),
     };
-    console.log("emitting", members);
 
     const membersSockets = getSockets(members);
-    console.log("members", membersSockets);
 
     io.to(membersSockets).emit(NEW_MESSAGE, {
       message: messageForRealTime,

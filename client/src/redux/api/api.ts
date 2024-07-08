@@ -6,7 +6,7 @@ const api = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: `${server}`,
   }),
-  tagTypes: ["Chat", "User"],
+  tagTypes: ["Chat", "User", "Message"],
   endpoints: (builder) => ({
     myChats: builder.query({
       query: () => ({
@@ -60,6 +60,21 @@ const api = createApi({
       },
       providesTags: ["Chat"],
     }),
+    getMessages: builder.query({
+      query: ({ chatId, page }) => ({
+        url: `/chat//message/${chatId}?page=${page}`,
+        credentials: "include",
+      }),
+      providesTags: ["Message"],
+    }),
+    sendAttachments: builder.mutation({
+      query: (data) => ({
+        url: "/chat/message",
+        credentials: "include",
+        method: "POST",
+        body: data,
+      }),
+    }),
   }),
 });
 
@@ -71,4 +86,6 @@ export const {
   useGetNotificationQuery,
   useAcceptFriendRequestMutation,
   useChatDetailsQuery,
+  useGetMessagesQuery,
+  useSendAttachmentsMutation,
 } = api;

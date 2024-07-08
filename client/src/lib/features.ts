@@ -31,5 +31,12 @@ const getLast7Days = () => {
   }
   return lastdays;
 };
-const transformImage = (url: string, width: number) => url;
-export { fileFormat, transformImage, getLast7Days };
+const transformImage = (url: string, width: number = 100) => {
+  const newUrl = url.replace(`upload/drp_auto/w_${width}/`);
+  return newUrl;
+};
+const transformPdf = (url: string) => {
+  const newUrl = url.replace(`upload/f_auto,q_auto/`);
+  return newUrl;
+};
+export { fileFormat, transformImage, getLast7Days, transformPdf };
