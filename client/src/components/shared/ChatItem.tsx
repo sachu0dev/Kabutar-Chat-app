@@ -1,8 +1,7 @@
-import React, { memo } from "react";
+import { Badge, Box, Stack, Typography } from "@mui/material";
+import { memo } from "react";
 import { Link } from "../styles/StyledComponents";
-import { Box, Stack, Typography } from "@mui/material";
 import AvatarCard from "./AvatarCard";
-import { grayColor } from "../../constants/color";
 
 const ChatItem = ({
   avatar = [],
@@ -34,12 +33,17 @@ const ChatItem = ({
           height: "6rem",
         }}
       >
-        <AvatarCard avatar={avatar} />
+        {avatar.length > 0 && (
+          <Badge badgeContent={newMessageAlert?.count} color="error">
+            <AvatarCard avatar={avatar} />
+          </Badge>
+        )}
+
         <Stack>
           <Typography>{name}</Typography>
-          {newMessageAlert && (
+          {/* {newMessageAlert && (
             <Typography>{newMessageAlert.count} New Message</Typography>
-          )}
+          )} */}
         </Stack>
         {isOnline ? (
           <Box

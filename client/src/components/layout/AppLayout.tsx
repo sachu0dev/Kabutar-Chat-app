@@ -1,5 +1,5 @@
 import { Drawer, Grid, Skeleton } from "@mui/material";
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { useErrors, useSocketEvents } from "../../hooks/hook";
@@ -15,6 +15,7 @@ import {
   incrementNotificationCount,
   setNewMessageAlert,
 } from "../../redux/reducers/chat";
+import { getOrSaveFromStorage } from "../../lib/features";
 
 const AppLayout = () => (WrappedComponent: React.FC) => {
   return (props) => {
@@ -31,9 +32,17 @@ const AppLayout = () => (WrappedComponent: React.FC) => {
     const { newMessageAlert } = useSelector((state: RootState) => state.chat);
     console.log(newMessageAlert, "newMessageAlert");
 
-    const { isLoading, data, isError, error, refetch } = useMyChatsQuery("");
+    const { isLoading, data, isError, error } = useMyChatsQuery("");
 
     useErrors([{ isError, error }]);
+
+    useEffect(() => {
+      getOrSaveFromStorage({
+        key: NEW_MESSAGE_ALERT,
+        value: newMessageAlert,
+        get: false,
+      });
+    }, [newMessageAlert]);
 
     const handleDeleteChat = (e, _id, groupChat) => {
       e.preventDefault();

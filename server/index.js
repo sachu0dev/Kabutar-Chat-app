@@ -12,10 +12,12 @@ import adminRouter from "./routes/admin.js";
 import chatRouter from "./routes/chat.js";
 import userRouter from "./routes/user.js";
 import { connectDB } from "./utils/featurns.js";
-import { NEW_MESSAGE, NEW_MESSAGE_ALERT } from "./constants/events.js";
+import { NEW_MESSAGE, NEW_MESSAGE_ALERT, START_TYPING, STOP_TYPING } from "./constants/events.js";
 import { Message } from "./models/message.js";
 import cookieParser from "cookie-parser";
 import { socketAuthenticator } from "./middlewares/auth.js";
+import { rateLimit } from 'express-rate-limit'
+import { log } from 'console';
 
 // Setup
 const app = express();
@@ -27,6 +29,14 @@ const io = new Server(server, {
     methods: ["GET", "POST", "DELETE", "OPTIONS"],
   }
 });
+const limiter = rateLimit({
+	windowMs: 15 * 60 * 1000, 
+	limit: 100,
+	standardHeaders: 'draft-7', 
+	legacyHeaders: false,
+})
+
+// app.use(limiter)
 
 app.set("io", io)
 const userSocketIDs = new Map();
@@ -103,6 +113,16 @@ io.on("connection", (socket) => {
       console.log(error);
     }
   });
+
+  socket.on(START_TYPING, ({ members, chatId , user}) => {
+    const membersSockets = getSockets(members);
+    socket.to(membersSockets).emit(START_TYPING, { chatId, user });
+  })
+
+  socket.on(STOP_TYPING, ({ members, chatId , user}) => {
+    const membersSockets = getSockets(members);
+    socket.to(membersSockets).emit(STOP_TYPING, { chatId, user });
+  })
 
   socket.on("disconnect", () => {
     console.log("Disconnected: " + socket.id);

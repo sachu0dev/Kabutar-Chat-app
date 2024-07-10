@@ -1,4 +1,9 @@
 import moment from "moment";
+interface StorageParams {
+  key: string;
+  value?: object;
+  get: boolean;
+}
 
 const fileFormat = (url: string): string => {
   const fileExtension = url.split(".").pop()?.toLowerCase();
@@ -39,4 +44,23 @@ const transformPdf = (url: string) => {
   const newUrl = url.replace(`upload/f_auto,q_auto/`);
   return newUrl;
 };
-export { fileFormat, transformImage, getLast7Days, transformPdf };
+
+const getOrSaveFromStorage = ({
+  key,
+  value,
+  get,
+}: StorageParams): any | null => {
+  if (get) {
+    const item = localStorage.getItem(key);
+    return item ? JSON.parse(item) : null;
+  } else {
+    localStorage.setItem(key, JSON.stringify(value));
+  }
+};
+export {
+  fileFormat,
+  transformImage,
+  getLast7Days,
+  transformPdf,
+  getOrSaveFromStorage,
+};
