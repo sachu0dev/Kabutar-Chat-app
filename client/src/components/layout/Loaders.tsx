@@ -1,4 +1,4 @@
-import { Grid, Skeleton, Stack } from "@mui/material";
+import { Grid, Skeleton, Stack, Typography } from "@mui/material";
 
 export const LayoutLoader = () => {
   return (
@@ -42,5 +42,20 @@ export const LayoutLoader = () => {
         </Grid>
       </Grid>
     </>
+  );
+};
+
+export const TypingLoader = ({ userTyping }) => {
+  return (
+    <Stack spacing={"0.5rem"} direction={"row"} justifyContent={"center"}>
+      <Typography
+        sx={{
+          fontSize: "0.8rem",
+          fontWeight: "bold",
+        }}
+      >
+        {userTyping.map((user) => user.name).join(", ") + " is typing..."}
+      </Typography>
+    </Stack>
   );
 };

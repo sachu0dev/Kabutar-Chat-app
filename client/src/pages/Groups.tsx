@@ -5,7 +5,6 @@ import {
   Edit as EditIcon,
   KeyboardBackspace as KeyboardBackspaceIcon,
   Menu as MenuIcon,
-  Padding,
 } from "@mui/icons-material";
 import {
   Backdrop,
@@ -21,11 +20,14 @@ import {
 } from "@mui/material";
 import { lazy, memo, Suspense, useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { LayoutLoader } from "../components/layout/Loaders";
 import AvatarCard from "../components/shared/AvatarCard";
+import UserItem from "../components/shared/UserItem";
 import { Link as LinkComponent } from "../components/styles/StyledComponents";
 import { bgGradient, matBlack } from "../constants/color";
 import { sampleChats, sampleUsers } from "../constants/sampleData";
-import UserItem from "../components/shared/UserItem";
+import { useErrors } from "../hooks/hook";
+import { useMyGroupsQuery } from "../redux/api/api";
 
 const ConfirmDeleteDialog = lazy(
   () => import("../components/dialog/ConfirmDeleteDialog")
@@ -46,11 +48,20 @@ function Groups() {
   const chatId = useSearchParams()[0].get("group");
   const navigate = useNavigate();
 
+  const myGroups = useMyGroupsQuery("");
+
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const [isEdit, setIsEdit] = useState(false);
   const [confirmDeleteDialog, setConfirmDeleteDialog] = useState(false);
   const [addMemberDialog, setAddMemberDialog] = useState(false);
+
+  const erros = [{ isError: myGroups.isError, error: myGroups.error }];
+
+  useErrors(erros);
+
+  console.log(myGroups.data);
+
   const navigateBack = () => {
     navigate("/");
   };
@@ -204,7 +215,9 @@ function Groups() {
     </Stack>
   );
 
-  return (
+  return myGroups.isLoading ? (
+    <LayoutLoader />
+  ) : (
     <Grid container height={"100vh"}>
       <Grid
         item

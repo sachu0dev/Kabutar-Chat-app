@@ -26,6 +26,7 @@ import { server } from "../../constants/config";
 import { userNotExist } from "../../redux/reducers/auth";
 import {
   setIsMobile,
+  setIsNewGroup,
   setIsNotification,
   setIsSearchMenu,
 } from "../../redux/reducers/misc";
@@ -39,7 +40,7 @@ const Notifications = lazy(() => import("../specific/Notifications"));
 const NewGroup = lazy(() => import("../specific/NewGroup"));
 
 const Header = () => {
-  const [isNewGroup, setIsNewGroup] = useState(false);
+  const { isNewGroup } = useSelector((state: RootState) => state.misc);
   const { isSearchMenu, isNotification } = useSelector(
     (state: RootState) => state.misc
   );
@@ -58,8 +59,7 @@ const Header = () => {
   };
 
   const openNewGroup = () => {
-    setIsNewGroup((prev) => !prev);
-    console.log("openNewGroup");
+    dispatch(setIsNewGroup(true));
   };
 
   const openNotification = () => {

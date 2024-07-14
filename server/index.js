@@ -80,6 +80,7 @@ io.on("connection", (socket) => {
 
   console.log("Connected: " + user.name);
   userSocketIDs.set(user._id.toString(), socket.id.toString());
+  console.log(userSocketIDs);
 
   socket.on(NEW_MESSAGE, async ({ chatId, members, message }) => {
     const messageForRealTime = {

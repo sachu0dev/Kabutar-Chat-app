@@ -10,20 +10,24 @@ import AppLayout from "../components/layout/AppLayout";
 import MessageComponent from "../components/shared/MessageComponent";
 import { InputBox } from "../components/styles/StyledComponents";
 import { grayColor, orange } from "../constants/color";
-import { NEW_MESSAGE, START_TYPING, STOP_TYPING } from "../constants/events";
+import {
+  ALERT,
+  NEW_MESSAGE,
+  START_TYPING,
+  STOP_TYPING,
+} from "../constants/events";
 import { useErrors, useSocketEvents } from "../hooks/hook";
 import { useChatDetailsQuery, useGetMessagesQuery } from "../redux/api/api";
 import { getSocket } from "../socket";
 import { useDispatch } from "react-redux";
 import { setIsFileMenu } from "../redux/reducers/misc";
 import { removeNewMessageAlert } from "../redux/reducers/chat";
+import { TypingLoader } from "../components/layout/Loaders";
 
 interface ChatProps {
   chatId: string;
   user: any;
 }
-
-let Timer;
 
 function Chat({ chatId, user }: ChatProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -62,10 +66,10 @@ function Chat({ chatId, user }: ChatProps) {
       });
       setIsTyping(true);
     }
-    if (Timer) {
-      clearTimeout(Timer);
-    }
-    Timer = setTimeout(() => {
+
+    if (typingTimeOut.current) clearTimeout(typingTimeOut.current);
+
+    typingTimeOut.current = setTimeout(() => {
       socket?.emit(STOP_TYPING, {
         members,
         chatId,
@@ -123,8 +127,6 @@ function Chat({ chatId, user }: ChatProps) {
 
   const stopTypingListener = useCallback(
     (data) => {
-      console.log(data);
-
       if (data.chatId !== chatId) return;
       setUserTyping((prev) =>
         prev.filter((user) => user._id !== data.user._id)
@@ -133,7 +135,29 @@ function Chat({ chatId, user }: ChatProps) {
     [chatId]
   );
 
+  const alertListner = useCallback(
+    (data) => {
+      if (data.chatId !== chatId) return;
+      const messageForAlert = {
+        content: data,
+        sender: {
+          _id: "ljdsklfj",
+          name: "Admin",
+        },
+        chat: chatId,
+        createdAt: new Date().toISOString(),
+      };
+      setMessages((prev) => [...prev, messageForAlert]);
+      // if (data.chatId !== chatId) return;
+      // setUserTyping((prev) =>
+      //   prev.filter((user) => user._id !== data.user._id)
+      // );
+    },
+    [chatId]
+  );
+
   const eventHandlers = {
+    [ALERT]: alertListner,
     [NEW_MESSAGE]: newMessagesListener,
     [START_TYPING]: stratTypingListener,
     [STOP_TYPING]: stopTypingListener,
@@ -200,16 +224,7 @@ function Chat({ chatId, user }: ChatProps) {
             userTyping={userTyping}
           />
         ))}
-        {userTyping.length > 0 && (
-          <Typography
-            sx={{
-              fontSize: "0.8rem",
-              fontWeight: "bold",
-            }}
-          >
-            {userTyping.map((user) => user.name).join(", ") + " is typing..."}
-          </Typography>
-        )}
+        {userTyping.length > 0 && <TypingLoader userTyping={userTyping} />}
       </Stack>
       <form
         style={{
