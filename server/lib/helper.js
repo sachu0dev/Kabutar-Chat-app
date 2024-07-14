@@ -7,10 +7,10 @@ export const getOtherMembers = (members, userId)=> {
 
 export const getSockets = (users = []) => {
   const sockets = users.map((user) => {
-    const userId = user.toString(); // Convert ObjectId to string
+    const userId = user.toString(); 
     const socketId = userSocketIDs.get(userId);
     if (!socketId) {
-      console.warn(`Socket ID not found for user: ${userId}`);
+      console.warn(`Socket ID not found for user: ${userId}`, userSocketIDs);
       return null;
     }
     return socketId.toString();
