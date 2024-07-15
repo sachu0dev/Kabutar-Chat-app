@@ -117,10 +117,8 @@ function Chat({ chatId, user }: ChatProps) {
   const stratTypingListener = useCallback(
     (data) => {
       if (data.chatId !== chatId) return;
-      console.log(data);
 
       setUserTyping((prev) => [...prev, data.user]);
-      console.log(userTyping);
     },
     [chatId]
   );
@@ -148,10 +146,6 @@ function Chat({ chatId, user }: ChatProps) {
         createdAt: new Date().toISOString(),
       };
       setMessages((prev) => [...prev, messageForAlert]);
-      // if (data.chatId !== chatId) return;
-      // setUserTyping((prev) =>
-      //   prev.filter((user) => user._id !== data.user._id)
-      // );
     },
     [chatId]
   );

@@ -34,7 +34,6 @@ const AppLayout = () => (WrappedComponent: React.FC) => {
     const { isMobile } = useSelector((state: RootState) => state.misc);
     const { user } = useSelector((state: RootState) => state.auth);
     const { newMessageAlert } = useSelector((state: RootState) => state.chat);
-    console.log(newMessageAlert, "newMessageAlert");
 
     const { isLoading, data, isError, error, refetch } = useMyChatsQuery("");
 

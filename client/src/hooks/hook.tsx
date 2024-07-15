@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import toast from "react-hot-toast";
 
 const useErrors = (errors = []) => {
@@ -46,20 +46,19 @@ const useAsyncMutation = (mutationHook) => {
 };
 
 const useSocketEvents = (socket, handlers) => {
+  const memoizedHandlers = useMemo(() => handlers, [handlers]);
+
   useEffect(() => {
-    Object.entries(handlers).forEach(
-      ([event, handler]) => {
-        socket.on(event, handler);
-      },
-      [socket, handlers]
-    );
+    Object.entries(memoizedHandlers).forEach(([event, handler]) => {
+      socket.on(event, handler);
+    });
 
     return () => {
-      Object.entries(handlers).forEach(([event, handler]) => {
+      Object.entries(memoizedHandlers).forEach(([event, handler]) => {
         socket.off(event, handler);
       });
     };
-  }, [socket, handlers]);
+  }, [socket, memoizedHandlers]);
 };
 
 export { useErrors, useAsyncMutation, useSocketEvents };
