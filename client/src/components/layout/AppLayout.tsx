@@ -1,7 +1,7 @@
 import { Drawer, Grid, Skeleton } from "@mui/material";
 import React, { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useErrors, useSocketEvents } from "../../hooks/hook";
 import { useMyChatsQuery } from "../../redux/api/api";
 import { setIsMobile } from "../../redux/reducers/misc";
@@ -25,11 +25,13 @@ const AppLayout = () => (WrappedComponent: React.FC) => {
   return (props) => {
     useSocketEvents;
     const params = useParams();
+    const navigate = useNavigate();
     const dispatch = useDispatch();
 
     const chatId = params.chatId;
 
     const socket = getSocket();
+    console.log("socket", socket);
 
     const { isMobile } = useSelector((state: RootState) => state.misc);
     const { user } = useSelector((state: RootState) => state.auth);
@@ -66,7 +68,8 @@ const AppLayout = () => (WrappedComponent: React.FC) => {
 
     const refetchListener = useCallback(() => {
       refetch();
-    }, [refetch]);
+      navigate("/");
+    }, [refetch, navigate]);
     const newRequestListener = useCallback(() => {
       dispatch(incrementNotificationCount());
     }, [dispatch]);

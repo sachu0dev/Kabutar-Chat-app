@@ -88,42 +88,40 @@ const getMyGroups = TryCatch(async (req, res, next) => {
 
 const addMembers = TryCatch(async (req, res, next) => {
   const { chatId, members } = req.body;
-
-  const isValidInput = addMembersSchema.safeParse({ name, members });
+  const isValidInput = addMembersSchema.safeParse({ chatId, members });
+  
   if (!isValidInput.success) {
     const errorMessages = isValidInput.error.issues.map(issue => issue.message).join(", ");
     return next(new ErrorHandler(errorMessages, 400));
   }
-
+  
   const chat = await Chat.findById(chatId);
-
+  
   if (!members || members.length < 1) return next(new ErrorHandler("Please provide members", 400));
-
   if (!chat) return next(new ErrorHandler("Chat not found", 404));
-
   if (!chat.groupChat) return next(new ErrorHandler("This is not a group chat", 400));
-
   if (chat.creator.toString() !== req.user.toString()) return next(new ErrorHandler("Only group chat creator can add members", 400));
 
+  const allChatMembers = chat.members.map((member) => member.toString());
+  
   const allNewMembersPromise = members.map((id) => User.findById(id, "name"));
   const allNewMembers = await Promise.all(allNewMembersPromise);
-
-  const newMemberIds = allNewMembers.map((member) => member._id.toNEW_MESSAGEString());
-
+  
+  const newMemberIds = allNewMembers.map((member) => member._id.toString());
+  
   const uniqueNewMembers = allNewMembers.filter((member) => !chat.members.some((existingMember) => existingMember.toString() === member._id.toString()));
-
-  if(uniqueNewMembers.length < 1) return next(new ErrorHandler("All members are already in the group", 400));
+  
+  if (uniqueNewMembers.length < 1) return next(new ErrorHandler("All members are already in the group", 400));
   if (chat.members.length + uniqueNewMembers.length > 100) return next(new ErrorHandler("Maximum 100 members are allowed", 400));
-
+  
   chat.members.push(...uniqueNewMembers.map((member) => member._id));
-
   await chat.save();
-
-  const allUserNames = uniqueNewMembers.map((member) => member.name).join(",");
-
+  
+  const allUserNames = uniqueNewMembers.map((member) => member.name).join(", ");
+  
   emitEvent(req, ALERT, `${allUserNames} added to group`);
-  emitEvent(req, "REFETCH_CHATS", chat.members);
-
+  emitEvent(req, "REFETCH_CHATS", allChatMembers);
+  
   return res.status(200).json({
     success: true,
     message: `${allUserNames} added to group`,
@@ -337,37 +335,35 @@ const renameGroup = TryCatch(async (req, res, next) => {
 const deleteChatDetails = TryCatch(async (req, res, next) => {
   const chatId = req.params.id;
   const chat = await Chat.findById(chatId);
-
   if (!chat) return next(new ErrorHandler("Chat not found", 404));
-
+  
   const members = chat.members;
-
-  if(chat.groupChat && chat.creator.toString() !== req.user.toString()) return next(new ErrorHandler("Only the group creator can delete the group", 400));
-
-  if(!chat.groupChat && !chat.members.includes(req.user)) return next(new ErrorHandler("you are not allowed to delete the chat", 403));
-
-  // here we have detete all messages as well as attachments or files from cloudinary
-
-  const messageWithAttachments = await Message.find({ chat: chatId ,
-    attachments: {
-      $exists: true, $ne: []
-    }
+  if (chat.groupChat && chat.creator.toString() !== req.user.toString()) 
+    return next(new ErrorHandler("Only the group creator can delete the group", 400));
+  if (!chat.groupChat && !chat.members.includes(req.user)) 
+    return next(new ErrorHandler("You are not allowed to delete the chat", 403));
+  
+  // Find messages with attachments
+  const messageWithAttachments = await Message.find({ 
+    chat: chatId,
+    attachments: { $exists: true, $ne: [] }
   });
+  
   const public_ids = [];
-
   messageWithAttachments.forEach(({ attachments }) => {
     attachments.forEach(({ public_id }) => {
       public_ids.push(public_id);
-    })
+    });
   });
+
   await Promise.all([
-    // Delete files form cloudinary
-    deleteFilesFromCloud(public_ids),Chat.deleteOne(),
+    deleteFilesFromCloud(public_ids),
+    Chat.findByIdAndDelete(chatId),
     Message.deleteMany({ chat: chatId }),
-
   ]);
-  emitEvent(req, REFETCH_CHATS, members);
 
+  emitEvent(req, REFETCH_CHATS, members);
+  
   return res.status(200).json({
     success: true,
     message: "Chat deleted successfully",
@@ -380,6 +376,9 @@ const getMessages = TryCatch(async (req, res, next) => {
 
   const limit = 20;
   const skip = (page - 1) * limit;
+  const chat = await Chat.findById(chatId);
+  if(!chat) return next(new ErrorHandler("Chat not found", 404));
+  if(!chat.members.includes(req.user.toString())) return next(new ErrorHandler("you are not allowed to access this chat", 403));
   const [messages, totalMessages] = await Promise.all([
     Message.find({ chat: chatId }).sort({ createdAt: -1 }).skip(skip).limit(limit).populate("sender", "name")
     .lean(),

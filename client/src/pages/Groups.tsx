@@ -10,6 +10,7 @@ import {
   Backdrop,
   Box,
   Button,
+  CircularProgress,
   Drawer,
   Grid,
   IconButton,
@@ -29,6 +30,7 @@ import { useAsyncMutation, useErrors } from "../hooks/hook";
 import {
   useAddGroupMemberMutation,
   useChatDetailsQuery,
+  useDeleteChatGroupMutation,
   useMyGroupsQuery,
   useRemoveGroupMemberMutation,
   useRenameGroupMutation,
@@ -75,8 +77,8 @@ function Groups() {
     useRemoveGroupMemberMutation
   );
 
-  const [addMember, isLoadingAddMember] = useAsyncMutation(
-    useAddGroupMemberMutation
+  const [deleteGroup, isLoadingDeleteGroup] = useAsyncMutation(
+    useDeleteChatGroupMutation
   );
 
   const { isAddMember } = useSelector((state: RootState) => state.misc);
@@ -86,7 +88,6 @@ function Groups() {
 
   const [isEdit, setIsEdit] = useState(false);
   const [confirmDeleteDialog, setConfirmDeleteDialog] = useState(false);
-  const [addMemberDialog, setAddMemberDialog] = useState(false);
 
   const [groupName, setGroupName] = useState("");
   const [groupNameUpdatedValue, setGroupNameUpdatedValue] = useState("");
@@ -130,8 +131,9 @@ function Groups() {
     dispatch(setIsAddMember(true));
   };
   const deleteHandler = () => {
-    console.log("deleteHandler");
-    // Implement delete functionality
+    deleteGroup("Deleting Group...", chatId);
+    closeConfirmDeleteHandler();
+    navigate("/groups");
   };
 
   const updateGroupName = () => {
@@ -310,7 +312,10 @@ function Groups() {
               height={"50vh"}
               overflow={"auto"}
             >
-              {members &&
+              {isLoadingRemoveMember ? (
+                <CircularProgress />
+              ) : (
+                members &&
                 members.map((user) => (
                   <UserItem
                     user={user}
@@ -323,7 +328,8 @@ function Groups() {
                     }}
                     handler={removeMemberHandler}
                   />
-                ))}
+                ))
+              )}
             </Stack>
             {ButtonGroup}
           </>
@@ -332,10 +338,7 @@ function Groups() {
 
       {isAddMember && (
         <Suspense fallback={<Backdrop open />}>
-          <AddMemberDialog
-            open={isAddMember}
-            closeHandler={closeAddMemberHandler}
-          />
+          <AddMemberDialog chatId={chatId} />
         </Suspense>
       )}
 

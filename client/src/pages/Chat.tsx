@@ -23,6 +23,7 @@ import { useDispatch } from "react-redux";
 import { setIsFileMenu } from "../redux/reducers/misc";
 import { removeNewMessageAlert } from "../redux/reducers/chat";
 import { TypingLoader } from "../components/layout/Loaders";
+import { useNavigate } from "react-router-dom";
 
 interface ChatProps {
   chatId: string;
@@ -33,6 +34,7 @@ function Chat({ chatId, user }: ChatProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
@@ -105,6 +107,12 @@ function Chat({ chatId, user }: ChatProps) {
 
     setMessage("");
   };
+
+  useEffect(() => {
+    if (!chatDetails.data?.chat) {
+      return navigate(`/`);
+    }
+  }, [chatDetails.data]);
 
   const newMessagesListener = useCallback(
     (data) => {
