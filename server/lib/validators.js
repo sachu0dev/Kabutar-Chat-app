@@ -9,7 +9,7 @@ const signUpSchema = z.object({
   avatar: z.object({
     public_id: z.string().min(1, { message: "Avatar public ID is required." }),
     url: z.string().url({ message: "Avatar URL must be a valid URL." })
-  })
+  }).optional()
 });
 
 const loginSchema = z.object({

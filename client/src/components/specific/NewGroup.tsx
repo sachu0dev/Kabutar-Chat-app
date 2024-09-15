@@ -18,16 +18,17 @@ import {
 } from "../../redux/api/api";
 import { setIsNewGroup } from "../../redux/reducers/misc";
 import UserItem from "../shared/UserItem";
+import { RootState } from "../../redux/store"; // Ensure RootState is imported correctly
 
 interface User {
   _id: string;
 }
 
 const NewGroup = () => {
-  const { isNewGroup } = useSelector((state: RootState) => state.misc); // Assuming RootState type
+  const { isNewGroup } = useSelector((state: RootState) => state.misc); // Correct RootState type
   const dispatch = useDispatch();
 
-  const { isError, isLoading, error, data } = useAvailableFriendsQuery();
+  const { isError, isLoading, error, data } = useAvailableFriendsQuery("");
 
   const [newGroup, newGroupLoading] = useAsyncMutation(useNewGroupMutation);
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]); // Assuming _id is string
@@ -59,8 +60,7 @@ const NewGroup = () => {
 
   const closeHandler = () => {
     dispatch(setIsNewGroup(false));
-    groupName.setValue("");
-    hook;
+    groupName.clear(); // Use clear method to reset input
     setSelectedUsers([]);
   };
 
@@ -86,6 +86,7 @@ const NewGroup = () => {
                 key={user._id}
                 handler={selectMembersHandler}
                 isAdded={selectedUsers.includes(user._id)}
+                handerIsLoading={isLoading}
               />
             ))
           )}

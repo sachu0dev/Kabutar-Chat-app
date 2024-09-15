@@ -14,8 +14,11 @@ const newUser = TryCatch(async (req, res, next) => {
   const file = req.file;
 
   if (!file) return next(new ErrorHandler("Please upload a file", 400));
+console.log("reached here");
 
   const result = await uploadFilesToCloud([file]);
+  console.log(result, "reached here");
+  
   const avatar = {
     public_id: result[0].public_id,
     url: result[0].url

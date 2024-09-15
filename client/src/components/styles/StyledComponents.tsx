@@ -19,9 +19,7 @@ export const Link = styled(LinkComponent)({
   textDecoration: "none",
   color: "black",
   padding: "1rem",
-  "&:hover": {
-    backgroundColor: "rgba(0, 0, 0, 0.1)",
-  },
+  
 });
 
 export const InputBox = styled("input")`
@@ -30,8 +28,13 @@ export const InputBox = styled("input")`
   border: none;
   padding: 0 3rem;
   border-radius: 1.5rem;
-  background-color: ${grayColor};
+  background-color: #EEEEF8;
   outline: none;
+  color: black;
+  font-size: 1rem;
+  &:focus {
+    border: 1px solid #dbdcff;
+  }
 `;
 
 export const SearchField = styled("input")`

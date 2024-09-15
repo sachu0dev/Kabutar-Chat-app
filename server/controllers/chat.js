@@ -39,7 +39,7 @@ const newGroupChat = TryCatch(async (req, res, next) => {
 });
 
 const getMyChats = TryCatch(async (req, res, next) => {
-  const chats = await Chat.find({ members: req.user }).populate("members", "name avatar");
+  const chats = await Chat.find({ members: req.user }).populate("members", "name avatar").sort({ updatedAt: -1 });
 
   const transformChats = chats.map(({ _id, name, members, groupChat }) => {
     return {
@@ -163,7 +163,7 @@ const removeMember = TryCatch(async (req, res, next) => {
   chat.members = chat.members.filter((member) => member.toString() !== userToBeRemoved._id.toString());
   await chat.save();
 
-  emitEvent(req, ALERT, `${userToBeRemoved.name} removed from group`);
+  emitEvent(req, ALERT, {message:`${userToBeRemoved.name} removed from group`, chatId});
   emitEvent(req, "REFETCH_CHATS", chat.members);
 
   return res.status(200).json({
@@ -206,7 +206,7 @@ const leaveGroup = TryCatch(async (req, res, next) => {
   const user = await User.findById(req.user, "name");
   await chat.save();
 
-  emitEvent(req, "ALERT", `User ${user.name} has left the group`);
+  emitEvent(req, "ALERT", {message:`${user.name} has left the group`, chatId});
   emitEvent(req, "REFETCH_CHATS", chat.members);
 
   return res.status(200).json({
@@ -334,6 +334,8 @@ const renameGroup = TryCatch(async (req, res, next) => {
 
 const deleteChatDetails = TryCatch(async (req, res, next) => {
   const chatId = req.params.id;
+  console.log(chatId);
+  
   const chat = await Chat.findById(chatId);
   if (!chat) return next(new ErrorHandler("Chat not found", 404));
   

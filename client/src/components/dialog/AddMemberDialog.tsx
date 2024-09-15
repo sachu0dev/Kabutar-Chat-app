@@ -16,10 +16,11 @@ import {
 } from "../../redux/api/api";
 import { useDispatch, useSelector } from "react-redux";
 import { setIsAddMember } from "../../redux/reducers/misc";
+import { RootState } from "../../redux/store";
 
 const AddMemberDialog = ({ chatId }) => {
   const dispatch = useDispatch();
-  const { isAddMember } = useSelector((state) => state.misc);
+  const { isAddMember } = useSelector((state: RootState) => state.misc);
 
   const { isLoading, data, isError, error } = useAvailableFriendsQuery(chatId);
 
@@ -63,6 +64,7 @@ const AddMemberDialog = ({ chatId }) => {
                 key={user._id}
                 user={user}
                 handler={selectMembersHandler}
+                handerIsLoading={isLoadingAddMember}
                 isAdded={selectedUsers.includes(user._id)}
               />
             ))

@@ -28,7 +28,6 @@ import { Link as LinkComponent } from "../components/styles/StyledComponents";
 import { bgGradient, matBlack } from "../constants/color";
 import { useAsyncMutation, useErrors } from "../hooks/hook";
 import {
-  useAddGroupMemberMutation,
   useChatDetailsQuery,
   useDeleteChatGroupMutation,
   useMyGroupsQuery,
@@ -37,6 +36,7 @@ import {
 } from "../redux/api/api";
 import { useDispatch, useSelector } from "react-redux";
 import { setIsAddMember } from "../redux/reducers/misc";
+import { RootState } from "../redux/store";
 
 const ConfirmDeleteDialog = lazy(
   () => import("../components/dialog/ConfirmDeleteDialog")
@@ -50,7 +50,7 @@ const AddMemberDialog = lazy(
 interface ChatGroup {
   _id: string;
   name: string;
-  avatar: string;
+  avatar: string[];
 }
 
 interface User {
@@ -77,7 +77,7 @@ function Groups() {
     useRemoveGroupMemberMutation
   );
 
-  const [deleteGroup, isLoadingDeleteGroup] = useAsyncMutation(
+  const [deleteGroup] = useAsyncMutation(
     useDeleteChatGroupMutation
   );
 
@@ -327,6 +327,7 @@ function Groups() {
                       borderRadius: "1rem",
                     }}
                     handler={removeMemberHandler}
+                    handerIsLoading={isLoadingRemoveMember}
                   />
                 ))
               )}

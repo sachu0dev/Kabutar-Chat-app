@@ -3,7 +3,7 @@ import {
   AttachFile as AttachFileIcon,
   Send as SendIcon,
 } from "@mui/icons-material";
-import { IconButton, Skeleton, Stack, Typography } from "@mui/material";
+import { IconButton, Skeleton, Stack } from "@mui/material";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import FileMenu from "../components/dialog/FileMenu";
 import AppLayout from "../components/layout/AppLayout";
@@ -109,10 +109,8 @@ function Chat({ chatId, user }: ChatProps) {
   };
 
   useEffect(() => {
-    if (!chatDetails.data?.chat) {
-      return navigate(`/`);
-    }
-  }, [chatDetails.data]);
+    if (chatDetails.isError) return navigate("/");
+  }, [chatDetails.isError]);
 
   const newMessagesListener = useCallback(
     (data) => {
@@ -145,7 +143,7 @@ function Chat({ chatId, user }: ChatProps) {
     (data) => {
       if (data.chatId !== chatId) return;
       const messageForAlert = {
-        content: data,
+        content: data.message,
         sender: {
           _id: "ljdsklfj",
           name: "Admin",
@@ -197,7 +195,7 @@ function Chat({ chatId, user }: ChatProps) {
     if (containerRef.current) {
       containerRef.current.scrollTop = containerRef.current.scrollHeight;
     }
-  }, [allMessages, userTyping]);
+  }, [messages, userTyping]);
 
   return chatDetails.isLoading ? (
     <Skeleton />
@@ -208,7 +206,7 @@ function Chat({ chatId, user }: ChatProps) {
         boxSizing="border-box"
         padding="1rem"
         spacing="1rem"
-        bgcolor={grayColor}
+        bgcolor={"white"}
         height="90%"
         sx={{
           overflowY: "auto",
@@ -223,7 +221,6 @@ function Chat({ chatId, user }: ChatProps) {
             key={message._id}
             message={message}
             user={user}
-            userTyping={userTyping}
           />
         ))}
         {userTyping.length > 0 && <TypingLoader userTyping={userTyping} />}
@@ -242,7 +239,7 @@ function Chat({ chatId, user }: ChatProps) {
           position="relative"
         >
           <IconButton
-            sx={{ position: "absolute", left: "1.5rem", rotate: "30deg" }}
+            sx={{ position: "absolute", left: "1.5rem", rotate: "30deg", color: "#7678ED" }}
             onClick={handleFileOpen}
           >
             <AttachFileIcon />
@@ -251,11 +248,12 @@ function Chat({ chatId, user }: ChatProps) {
             placeholder="Type Message Here...."
             value={message}
             onChange={messageOnChangeHandler}
+            
           />
           <IconButton
             type="submit"
             sx={{
-              bgcolor: orange,
+              bgcolor: "#7678ED",
               color: "white",
               marginLeft: "1rem",
               padding: "0.5rem",

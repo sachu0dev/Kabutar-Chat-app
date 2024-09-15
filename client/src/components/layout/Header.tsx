@@ -1,4 +1,4 @@
-import React, { lazy, Suspense, useState } from "react";
+import React, { lazy, Suspense } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
@@ -31,7 +31,6 @@ import {
   setIsSearchMenu,
 } from "../../redux/reducers/misc";
 
-// Ensure RootState type is imported from your store configuration
 import { RootState } from "../../redux/store";
 import { resetNotificationCount } from "../../redux/reducers/chat";
 
@@ -86,7 +85,7 @@ const Header = () => {
   return (
     <>
       <Box sx={{ flexGrow: 1 }} height={"4rem"}>
-        <AppBar position="static" sx={{ bgcolor: orange }}>
+        <AppBar position="static" sx={{ backgroundColor: "#7678ED", }}>
           <Toolbar>
             <Typography
               onClick={() => navigate("/")}
@@ -155,7 +154,7 @@ const Header = () => {
   );
 };
 
-const IconBtn = ({ title, icon, onClick, value }) => {
+const IconBtn = ({ title, icon, onClick, value = null }) => {
   return (
     <Tooltip title={title}>
       <IconButton color="inherit" size="large" onClick={onClick}>

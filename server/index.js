@@ -18,6 +18,7 @@ import cookieParser from "cookie-parser";
 import { socketAuthenticator } from "./middlewares/auth.js";
 import { rateLimit } from 'express-rate-limit'
 import { log } from 'console';
+import { Chat } from './models/chat.js';
 
 // Setup
 const app = express();
@@ -53,13 +54,13 @@ const port = process.env.PORT || 3000;
 
 connectDB(process.env.MONGO_URI);
 
+
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// Routes
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });
@@ -109,6 +110,9 @@ io.on("connection", (socket) => {
 
     try {
       await Message.create(messageForDB);
+      await Chat.findByIdAndUpdate(chatId, {
+        updatedAt: new Date().toISOString(),
+      })
     } catch (error) {
       console.log(error);
     }

@@ -47,37 +47,61 @@ const emitEvent = (req, event, users, data) => {
   }
 };
 
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 
 
 const uploadFilesToCloud = async (files = []) => {
+  console.log("Reached in uploadFilesToCloud");
+
   const uploadPromises = files.map(async (file) => {
+    console.log("Processing file:", file);
     try {
       const base64File = getBase64(file);
       return new Promise((resolve, reject) => {
-        cloudinary.uploader.upload(base64File, {
-          resource_type: "auto",
-          public_id: uuid()
-        }, (error, result) => {
-          if (error) return reject(error);
-          resolve(result);
-        });
+        cloudinary.uploader.upload(
+          base64File,
+          {
+            resource_type: "auto",
+            public_id: uuid(),
+          },
+          (error, result) => {
+            if (error) {
+              console.error("Upload error:", error); 
+              return reject(error);
+            }
+            console.log("Upload result:", result); 
+            resolve(result);
+          }
+        );
       });
     } catch (error) {
+      console.error("Error in getBase64:", error); 
       throw new Error(`Error converting file to base64: ${error.message}`);
     }
   });
 
+  console.log("Reached in uploadFilesToCloud 2");
+
   try {
     const results = await Promise.all(uploadPromises);
-    return results.map(result => ({
+    console.log(results, "Reached here 3");
+
+    return results.map((result) => ({
       public_id: result.public_id,
-      url: result.secure_url
+      url: result.secure_url,
     }));
   } catch (error) {
+    console.error("Error in uploadFilesToCloud:", error); 
     throw new Error(`Error uploading files to Cloudinary: ${error.message}`);
   }
 };
+
+
 
 const deleteFilesFromCloud  = (public_ids) =>{
   console.log(public_ids);

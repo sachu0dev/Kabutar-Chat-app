@@ -2,6 +2,8 @@ import { Badge, Box, Stack, Typography } from "@mui/material";
 import { memo } from "react";
 import { Link } from "../styles/StyledComponents";
 import AvatarCard from "./AvatarCard";
+import { motion } from "framer-motion";
+import { Margin } from "@mui/icons-material";
 
 const ChatItem = ({
   avatar = [],
@@ -20,31 +22,39 @@ const ChatItem = ({
       onContextMenu={(e) => handleDeleteChat(e, _id, groupChat)}
     >
       <Box
-        sx={{
+        style={{
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
           padding: "1rem",
-          backgroundColor: sameSender ? "black" : "unset",
+          backgroundColor: sameSender ? "#EEEEF8" : "unset",
           color: sameSender ? "white" : "unset",
           position: "relative",
           gap: "1rem",
           cursor: "pointer",
           height: "6rem",
+          margin: "0.5rem 0.5rem 0 0.5rem",
+          "&:hover": {
+          backgroundColor: "rgba(0, 0, 0, 0.1)",
+        },
+          borderRadius: "1rem",
         }}
+       
       >
+        <div style={{ display: "flex", alignItems: "center", gap: "2rem"}}>
         {avatar.length > 0 && (
-          <Badge badgeContent={newMessageAlert?.count} color="error">
+          <Badge badgeContent={newMessageAlert?.count} color="warning">
             <AvatarCard avatar={avatar} />
           </Badge>
         )}
 
         <Stack>
-          <Typography>{name}</Typography>
-          {/* {newMessageAlert && (
+          <Typography color={"black"} variant="h6">{name}</Typography>
+          {newMessageAlert && (
             <Typography>{newMessageAlert.count} New Message</Typography>
-          )} */}
+          )}
         </Stack>
+        </div>
         {isOnline ? (
           <Box
             sx={{

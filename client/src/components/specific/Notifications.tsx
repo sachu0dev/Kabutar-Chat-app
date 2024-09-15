@@ -20,7 +20,7 @@ import toast from "react-hot-toast";
 
 function Notifications() {
   const { isNotification } = useSelector((state: any) => state.misc);
-  const { isLoading, data, error, isError } = useGetNotificationQuery();
+  const { isLoading, data, error, isError } = useGetNotificationQuery("");
   const dispatch = useDispatch();
   const [acceptRequest] = useAcceptFriendRequestMutation();
 

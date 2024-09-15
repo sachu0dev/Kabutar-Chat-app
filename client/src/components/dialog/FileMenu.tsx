@@ -10,9 +10,10 @@ import {
 import { useRef } from "react";
 import toast from "react-hot-toast";
 import { useSendAttachmentsMutation } from "../../redux/api/api";
+import { RootState } from "../../redux/store";
 
-const FileMenu = ({ anchorE1, chatId }) => {
-  const { isFileMenu } = useSelector((state) => state.misc);
+const FileMenu = ({ anchorEl, chatId }) => {
+  const { isFileMenu } = useSelector((state: RootState) => state.misc);
   const dispatch = useDispatch();
 
   const imageRef = useRef(null);
@@ -29,39 +30,39 @@ const FileMenu = ({ anchorE1, chatId }) => {
   const selectVideo = () => videoRef.current?.click();
   const selectFile = () => fileRef.current?.click();
 
-  const fileChangeHandler = async (e, key) => {
-    const files = Array.from(e.target.files);
-
+  const fileChangeHandler = async (e: React.ChangeEvent<HTMLInputElement>, key: string) => {
+    const files = Array.from(e.target.files as FileList);  
+  
     if (files.length <= 0) return;
-
+  
     if (files.length > 5)
       return toast.error(`You can only send 5 ${key} at a time`);
-
+  
     dispatch(setUploadingLoader(true));
     const toastId = toast.loading(`Send ${files.length} ${key}....`);
     closeFileMenu();
-
+  
     try {
       const myForm = new FormData();
       myForm.append("chatId", chatId);
-      files.forEach((file) => myForm.append("files", file));
-      const responce = await sendAttchments(myForm);
-      if (responce.data)
+      files.forEach((file) => myForm.append("files", file));  
+      const response = await sendAttchments(myForm);
+      if (response.data)
         toast.success("File uploaded successfully", { id: toastId });
       else {
-        toast.error(responce?.error?.data?.message || "Something went wrong", {
+        toast.error("Something went wrong", {
           id: toastId,
         });
-        console.log(responce);
+        console.log(response);
       }
     } catch (error) {
-      toast.error(error, { id: toastId });
+      toast.error(error as string, { id: toastId });  
     } finally {
       dispatch(setUploadingLoader(false));
     }
   };
   return (
-    <Menu anchorEl={anchorE1} open={isFileMenu} onClose={closeFileMenu}>
+    <Menu anchorEl={anchorEl} open={isFileMenu} onClose={closeFileMenu}>
       <div style={{ width: "10rem" }}>
         <MenuList>
           <MenuItem onClick={selectImage}>

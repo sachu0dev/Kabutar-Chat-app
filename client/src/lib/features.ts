@@ -1,4 +1,5 @@
 import moment from "moment";
+
 interface StorageParams {
   key: string;
   value?: object;
@@ -9,24 +10,14 @@ const fileFormat = (url: string): string => {
   const fileExtension = url.split(".").pop()?.toLowerCase();
   if (!fileExtension) return "file";
 
-  if (
-    fileExtension === "mp4" ||
-    fileExtension === "webm" ||
-    fileExtension === "ogg"
-  )
-    return "video";
-  if (
-    fileExtension === "png" ||
-    fileExtension === "jpg" ||
-    fileExtension === "jpeg" ||
-    fileExtension === "gif"
-  )
-    return "image";
+  if (["mp4", "webm", "ogg"].includes(fileExtension)) return "video";
+  if (["png", "jpg", "jpeg", "gif"].includes(fileExtension)) return "image";
   if (fileExtension === "pdf") return "pdf";
-  if (fileExtension === "mp3" || fileExtension === "wav") return "audio";
+  if (["mp3", "wav"].includes(fileExtension)) return "audio";
 
   return "file";
 };
+
 const getLast7Days = () => {
   const currentDate = moment();
   const lastdays = [];
@@ -36,31 +27,25 @@ const getLast7Days = () => {
   }
   return lastdays;
 };
+
 const transformImage = (url: string, width: number = 100) => {
-  const newUrl = url.replace(`upload/drp_auto/w_${width}/`);
-  return newUrl;
-};
-const transformPdf = (url: string) => {
-  const newUrl = url.replace(`upload/f_auto,q_auto/`);
+  const newUrl = url.replace(/upload/, `upload/drp_auto/w_${width}`);
   return newUrl;
 };
 
-const getOrSaveFromStorage = ({
-  key,
-  value,
-  get,
-}: StorageParams): any | null => {
+const transformPdf = (url: string) => {
+  const newUrl = url.replace(/upload/, `upload/f_auto,q_auto`);
+  return newUrl;
+};
+
+const getOrSaveFromStorage = <T>({ key, value, get }: StorageParams): T | null => {
   if (get) {
     const item = localStorage.getItem(key);
-    return item ? JSON.parse(item) : null;
+    return item ? (JSON.parse(item) as T) : null;
   } else {
     localStorage.setItem(key, JSON.stringify(value));
+    return null;
   }
 };
-export {
-  fileFormat,
-  transformImage,
-  getLast7Days,
-  transformPdf,
-  getOrSaveFromStorage,
-};
+
+export { fileFormat, transformImage, getLast7Days, transformPdf, getOrSaveFromStorage };

@@ -2,12 +2,17 @@ import { createSlice } from "@reduxjs/toolkit";
 import { getOrSaveFromStorage } from "../../lib/features";
 import { NEW_MESSAGE_ALERT } from "../../constants/events";
 
+interface NewMessageAlert {
+  chatId: string;
+  count: number;
+}
+
 const initialState = {
   notificationCount: 0,
-  newMessageAlert: getOrSaveFromStorage({
+  newMessageAlert: (getOrSaveFromStorage({
     key: NEW_MESSAGE_ALERT,
     get: true,
-  }) || [
+  }) as NewMessageAlert[]) || [
     {
       chatId: "",
       count: 0,
@@ -32,9 +37,7 @@ const chatSlice = createSlice({
 
       if (index !== -1) {
         state.newMessageAlert[index].count += 1;
-      }
-
-      if (index === -1) {
+      } else {
         state.newMessageAlert.push({
           chatId: action.payload.chatId,
           count: 1,

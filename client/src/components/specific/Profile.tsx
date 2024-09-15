@@ -6,10 +6,12 @@ import {
 } from "@mui/icons-material";
 import moment from "moment";
 import { useSelector } from "react-redux";
-import { RootState } from "@reduxjs/toolkit/query";
 import { transformImage } from "../../lib/features";
+import { RootState } from "../../redux/store";
+
 const Profile = () => {
   const { user } = useSelector((state: RootState) => state.auth);
+
   return (
     <Stack spacing={"2rem"} direction={"column"} alignItems={"center"}>
       <Avatar
@@ -21,7 +23,7 @@ const Profile = () => {
           border: "5px solid white",
         }}
         src={transformImage(user?.avatar.url, 200)}
-      ></Avatar>
+      />
       <ProfileCard heading={"Bio"} text={user?.bio} />
       <ProfileCard
         heading={"Username"}
@@ -37,7 +39,15 @@ const Profile = () => {
     </Stack>
   );
 };
-const ProfileCard = ({ text, Icon, heading }) => (
+
+// Updated ProfileCard component with optional Icon prop
+interface ProfileCardProps {
+  text: string;
+  heading: string;
+  Icon?: JSX.Element; // Mark Icon as optional
+}
+
+const ProfileCard = ({ text, Icon, heading }: ProfileCardProps) => (
   <Stack
     direction={"row"}
     alignItems={"center"}
@@ -54,4 +64,5 @@ const ProfileCard = ({ text, Icon, heading }) => (
     </Stack>
   </Stack>
 );
+
 export default Profile;

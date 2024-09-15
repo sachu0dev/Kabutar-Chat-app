@@ -17,6 +17,7 @@ import {
 } from "../../redux/api/api";
 import { setIsSearchMenu } from "../../redux/reducers/misc";
 import UserItem from "../shared/UserItem";
+import { RootState } from "../../redux/store";
 
 function Search() {
   const search = useInputValidation("");

@@ -1,10 +1,10 @@
 import { Drawer, Grid, Skeleton } from "@mui/material";
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { useErrors, useSocketEvents } from "../../hooks/hook";
 import { useMyChatsQuery } from "../../redux/api/api";
-import { setIsMobile } from "../../redux/reducers/misc";
+import { setIsDeleteMenu, setIsMobile, setSelectedDeleteChat } from "../../redux/reducers/misc";
 import Title from "../shared/Title";
 import ChatList from "../specific/ChatList";
 import Profile from "../specific/Profile";
@@ -20,6 +20,8 @@ import {
   setNewMessageAlert,
 } from "../../redux/reducers/chat";
 import { getOrSaveFromStorage } from "../../lib/features";
+import DeleteChatMenu from "../dialog/DeleteChatMenu";
+import { RootState } from "../../redux/store";
 
 const AppLayout = () => (WrappedComponent: React.FC) => {
   return (props) => {
@@ -29,9 +31,10 @@ const AppLayout = () => (WrappedComponent: React.FC) => {
     const dispatch = useDispatch();
 
     const chatId = params.chatId;
+    const deleteMenuAnchore = useRef(null);
+
 
     const socket = getSocket();
-    console.log("socket", socket);
 
     const { isMobile } = useSelector((state: RootState) => state.misc);
     const { user } = useSelector((state: RootState) => state.auth);
@@ -49,9 +52,10 @@ const AppLayout = () => (WrappedComponent: React.FC) => {
       });
     }, [newMessageAlert]);
 
-    const handleDeleteChat = (e, _id, groupChat) => {
-      e.preventDefault();
-      console.log(_id, groupChat);
+    const handleDeleteChat = (e, chatId, groupChat) => {
+      dispatch(setIsDeleteMenu(true));
+      dispatch(setSelectedDeleteChat({ chatId, groupChat }));
+      deleteMenuAnchore.current = e.currentTarget;
     };
 
     const handleMobile = () => dispatch(setIsMobile(true));
@@ -86,6 +90,8 @@ const AppLayout = () => (WrappedComponent: React.FC) => {
       <>
         <Title title="chat" description="a chat app" />
         <Header />
+
+        <DeleteChatMenu dispatch={dispatch} deleteMenuAnchore={deleteMenuAnchore } />
 
         {isLoading ? (
           <Skeleton />
@@ -137,7 +143,7 @@ const AppLayout = () => (WrappedComponent: React.FC) => {
               },
             }}
             height={"calc(100vh - 4rem)"}
-            bgcolor={"#1d1c20"}
+            bgcolor={"#202022"}
           >
             <Profile />
           </Grid>
