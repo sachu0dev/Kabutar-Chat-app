@@ -34,9 +34,6 @@ const ChatItem = ({
           cursor: "pointer",
           height: "6rem",
           margin: "0.5rem 0.5rem 0 0.5rem",
-          "&:hover": {
-          backgroundColor: "rgba(0, 0, 0, 0.1)",
-        },
           borderRadius: "1rem",
         }}
        

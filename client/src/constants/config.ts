@@ -1,1 +1,1 @@
-export const server = "http://localhost:3000/api/v1";
+export const server = "https://kabutar-chat-server.onrender.com/api/v1";

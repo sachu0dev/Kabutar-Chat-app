@@ -13,7 +13,7 @@ interface SocketProviderProps {
 
 const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
   const socket = useMemo(() => {
-    const socketInstance = io("http://localhost:3000", {
+    const socketInstance = io("https://kabutar-chat-server.onrender.com", {
       withCredentials: true,
     });
 
