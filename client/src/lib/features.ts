@@ -29,13 +29,15 @@ const getLast7Days = () => {
 };
 
 const transformImage = (url: string, width: number = 100) => {
-  const newUrl = url.replace(/upload/, `upload/drp_auto/w_${width}`);
-  return newUrl;
+  console.log(url);
+  
+  const newUrl = url.replace(/upload/, `${width}`);
+  return url;
 };
 
 const transformPdf = (url: string) => {
   const newUrl = url.replace(/upload/, `upload/f_auto,q_auto`);
-  return newUrl;
+  return url;
 };
 
 const getOrSaveFromStorage = <T>({ key, value, get }: StorageParams): T | null => {

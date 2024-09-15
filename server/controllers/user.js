@@ -24,8 +24,6 @@ console.log("reached here");
     url: result[0].url
   };
 
-
-
   const isValidInput = signUpSchema.safeParse({ name, username, password, bio,avatar });
 
   if (!isValidInput.success) {
