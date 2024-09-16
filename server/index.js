@@ -12,7 +12,7 @@ import adminRouter from "./routes/admin.js";
 import chatRouter from "./routes/chat.js";
 import userRouter from "./routes/user.js";
 import { connectDB } from "./utils/featurns.js";
-import { NEW_MESSAGE, NEW_MESSAGE_ALERT, START_TYPING, STOP_TYPING } from "./constants/events.js";
+import { NEW_MESSAGE, NEW_MESSAGE_ALERT, START_TYPING, STOP_TYPING, JOIN_CHAT } from "./constants/events.js";
 import { Message } from "./models/message.js";
 import cookieParser from "cookie-parser";
 import { socketAuthenticator } from "./middlewares/auth.js";
