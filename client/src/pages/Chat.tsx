@@ -16,7 +16,6 @@ import { TypingLoader } from "../components/layout/Loaders";
 import {
   ALERT,
   NEW_MESSAGE,
-  NEW_MESSAGE_ALERT,
   START_TYPING,
   STOP_TYPING,
   JOIN_CHAT,
