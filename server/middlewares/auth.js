@@ -5,6 +5,8 @@ import { TryCatch } from "./error.js";
 
 const isAuthenicated = TryCatch(async(req, res, next) => {
   const token = req.cookies.token;
+  console.log(token);
+  
   if(!token) return next(new ErrorHandler("Please Login to access this resource", 401));
 
   const decoded = jwt.verify(token, process.env.JWT_SECRET);

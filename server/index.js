@@ -17,7 +17,6 @@ import { Message } from "./models/message.js";
 import cookieParser from "cookie-parser";
 import { socketAuthenticator } from "./middlewares/auth.js";
 import { rateLimit } from 'express-rate-limit'
-import { log } from 'console';
 import { Chat } from './models/chat.js';
 
 // Setup
