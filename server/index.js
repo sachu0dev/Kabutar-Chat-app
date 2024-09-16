@@ -80,6 +80,11 @@ io.on("connection", (socket) => {
   const user = socket.user;
   userSocketIDs.set(user._id.toString(), socket.id.toString());
 
+  socket.on(JOIN_CHAT, ({ chatId }) => {
+    socket.join(chatId);
+    console.log(`User ${user.name} joined chat room: ${chatId}`);
+  });
+
   socket.on(NEW_MESSAGE, async ({ chatId, members, message }) => {
     const messageForRealTime = {
       content: message,
@@ -98,41 +103,38 @@ io.on("connection", (socket) => {
       chat: new mongoose.Types.ObjectId(chatId),
     };
 
-    const membersSockets = getSockets(members);
-    console.log("membersSockets", membersSockets);
-
-
-    io.to(membersSockets).emit(NEW_MESSAGE, {
+    io.to(chatId).emit(NEW_MESSAGE, {
       message: messageForRealTime,
       chatId,
     });
+
+    const membersSockets = getSockets(members);
     io.to(membersSockets).emit(NEW_MESSAGE_ALERT, { chatId });
 
     try {
       await Message.create(messageForDB);
       await Chat.findByIdAndUpdate(chatId, {
         updatedAt: new Date().toISOString(),
-      })
+      });
     } catch (error) {
       console.log(error);
     }
   });
 
-  socket.on(START_TYPING, ({ members, chatId , user}) => {
-    const membersSockets = getSockets(members);
-    socket.to(membersSockets).emit(START_TYPING, { chatId, user });
-  })
+  socket.on(START_TYPING, ({ chatId, user }) => {
+    socket.to(chatId).emit(START_TYPING, { chatId, user });
+  });
 
-  socket.on(STOP_TYPING, ({ members, chatId , user}) => {
-    const membersSockets = getSockets(members);
-    socket.to(membersSockets).emit(STOP_TYPING, { chatId, user });
-  })
+  socket.on(STOP_TYPING, ({ chatId, user }) => {
+    socket.to(chatId).emit(STOP_TYPING, { chatId, user });
+  });
 
   socket.on("disconnect", () => {
     console.log("Disconnected: " + socket.user.name);
     userSocketIDs.delete(user._id.toString());
   });
 });
+
 
 // Error Middleware
 app.use(errorMiddleware);
