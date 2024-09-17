@@ -64,7 +64,13 @@ const logout = async (req, res) => {
   try {
     res
       .status(200)
-      .cookie("token", "", { expires: new Date(0), httpOnly: true })
+      .cookie("token", "", {
+        httpOnly: true, 
+        expires: new Date(0),
+        secure: true, 
+        sameSite: 'None', 
+        domain: 'https://kabutar-chat-server.onrender.com'
+      })
       .json({
         success: true,
         message: "Logged Out"
