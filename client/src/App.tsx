@@ -19,13 +19,15 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const App = () => {
   const dispatch = useDispatch();
   const { user, loader } = useSelector((state: RootState) => state.auth);
-
-  useEffect(() => {
+  if(!user){
     axios
       .get(`${server}/user/me`, { withCredentials: true })
       .then((res) => dispatch(userExists(res.data.user)))
       .catch(() => dispatch(userNotExist()));
-  }, [dispatch, user]);
+  }
+  useEffect(() => {
+    
+  }, [dispatch,user]);
 
   return loader ? (
     <LayoutLoader />
