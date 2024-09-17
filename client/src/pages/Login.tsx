@@ -313,7 +313,6 @@ function Login() {
               </form>
             </>
           )}
-          <p>Note: use these dummy acc to login</p>
         </Paper>
       </Container>
     </div>

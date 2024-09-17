@@ -12,7 +12,7 @@ import { RootState } from "../../redux/store";
 const Profile = () => {
   const { user } = useSelector((state: RootState) => state.auth);
 
-  return user?.avatar?.url ? (
+  return user?.avatar?.url && (
     <Stack spacing={"2rem"} direction={"column"} alignItems={"center"}>
       <Avatar
         sx={{
@@ -37,14 +37,7 @@ const Profile = () => {
         Icon={<CalendarIcon />}
       />
     </Stack>
-  ) : (
-    <Backdrop
-      sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-      open
-    >
-      <Typography variant="h5">Loading...</Typography>
-    </Backdrop>
-  );
+  )
 };
 
 interface ProfileCardProps {
