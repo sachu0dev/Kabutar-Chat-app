@@ -9,7 +9,7 @@ import {
   Typography,
 } from "@mui/material";
 import { CameraAlt as CameraAltIcon } from "@mui/icons-material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { VisuallyHiddenInput } from "../components/styles/StyledComponents";
 import { useFileHandler, useInputValidation, useStrongPassword } from "6pp";
 import { usernameValdator } from "../utils/validators";
@@ -36,6 +36,7 @@ function Login() {
 
   const avatar = useFileHandler("single");
 
+
   const submitFormLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -56,7 +57,7 @@ function Login() {
         config
       );
       toast.success(data.message);
-        navigate("/");
+      navigate("/");
       dispatch(userExists(true));
     } catch (error: any) {
       console.log(error);
@@ -90,6 +91,27 @@ function Login() {
       toast.error(error?.response?.data?.message || "Something went wrong");
     }
   };
+
+  useEffect(() => {
+    toast.dismiss();
+    toast.custom(
+      () => (
+        <div
+          style={{
+            padding: "16px",
+            borderRadius: "8px",
+            backgroundColor: "#fff",
+            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+          }}
+        >
+          <Typography variant="h6">Demo Account</Typography>
+          <Typography variant="body1">Username: test</Typography>
+          <Typography variant="body1">Password: 123456</Typography>
+        </div>
+      ),
+      { duration: 10000 } 
+    );
+  }, []);
 
   return (
     <div
@@ -311,7 +333,6 @@ function Login() {
               </form>
             </>
           )}
-          <p>Note: use these dummy acc to login</p>
         </Paper>
       </Container>
     </div>
