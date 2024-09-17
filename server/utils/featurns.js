@@ -8,7 +8,7 @@ const cookieOptions = {
   sameSite: "none",
   httpOnly: true,
   secure: true,
-  domain: "https://kabutar-chat-server.onrender.com"
+  domain: "kabutar-chat-server.onrender.com"
 };
 const connectDB = (url) => {
   mongoose.connect(url,{dbName: "kabutar"})
