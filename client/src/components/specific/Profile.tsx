@@ -1,4 +1,4 @@
-import { Avatar, Stack, Typography, Skeleton } from "@mui/material";
+import { Avatar, Backdrop, Stack, Typography } from "@mui/material";
 import {
   Face as FaceIcon,
   AlternateEmail as UserNameIcon,
@@ -12,61 +12,45 @@ import { RootState } from "../../redux/store";
 const Profile = () => {
   const { user } = useSelector((state: RootState) => state.auth);
 
-  const isLoading = !user.username && !user.bio && !user.avatar.url;
-
-  return (
+  return user.avatar.url ? (
     <Stack spacing={"2rem"} direction={"column"} alignItems={"center"}>
-      {isLoading ? (
-        <Skeleton
-          variant="circular"
-          width={200}
-          height={200}
-          sx={{ marginBottom: "1rem" }}
-        />
-      ) : (
-        <Avatar
-          sx={{
-            width: "200px",
-            height: "200px",
-            objectFit: "contain",
-            marginBottom: "1rem",
-            border: "5px solid white",
-          }}
-          src={transformImage(user?.avatar.url, 200)}
-        />
-      )}
-
-      {isLoading ? (
-        <>
-          <Skeleton width={150} height={30} />
-          <Skeleton width={200} height={30} />
-          <Skeleton width={150} height={30} />
-          <Skeleton width={100} height={30} />
-        </>
-      ) : (
-        <>
-          <ProfileCard heading={"Bio"} text={user?.bio} />
-          <ProfileCard
-            heading={"Username"}
-            text={user?.username}
-            Icon={<UserNameIcon />}
-          />
-          <ProfileCard heading={"Name"} text={user?.name} Icon={<FaceIcon />} />
-          <ProfileCard
-            heading={"Joined"}
-            text={moment(user?.createdAt).fromNow()}
-            Icon={<CalendarIcon />}
-          />
-        </>
-      )}
+      <Avatar
+        sx={{
+          width: "200px",
+          height: "200px",
+          objectFit: "contain",
+          marginBottom: "1rem",
+          border: "5px solid white",
+        }}
+        src={transformImage(user?.avatar.url, 200)}
+      />
+      <ProfileCard heading={"Bio"} text={user?.bio} />
+      <ProfileCard
+        heading={"Username"}
+        text={user?.username}
+        Icon={<UserNameIcon />}
+      />
+      <ProfileCard heading={"Name"} text={user?.name} Icon={<FaceIcon />} />
+      <ProfileCard
+        heading={"Joined"}
+        text={moment(user?.createdAt).fromNow()}
+        Icon={<CalendarIcon />}
+      />
     </Stack>
+  ) : (
+    <Backdrop
+      sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+      open
+    >
+      <Typography variant="h5">Loading...</Typography>
+    </Backdrop>
   );
 };
 
 interface ProfileCardProps {
   text: string;
   heading: string;
-  Icon?: JSX.Element;
+  Icon?: JSX.Element; // Mark Icon as optional
 }
 
 const ProfileCard = ({ text, Icon, heading }: ProfileCardProps) => (

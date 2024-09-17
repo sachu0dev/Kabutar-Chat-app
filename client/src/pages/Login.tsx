@@ -56,10 +56,8 @@ function Login() {
         config
       );
       toast.success(data.message);
-      setTimeout(() => {
         navigate("/");
       dispatch(userExists(true));
-      }, 1000);
     } catch (error: any) {
       console.log(error);
       toast.error(error?.response?.data?.message || "Something went wrong");
