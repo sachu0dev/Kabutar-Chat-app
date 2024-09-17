@@ -4,11 +4,11 @@ import  {v2 as cloudinary}  from 'cloudinary';
 import { v4 as uuid } from "uuid";
 import { getBase64, getSockets } from "../lib/helper.js";
 const cookieOptions = {
-  maxAge: 15 * 24 * 60 * 60 * 1000,
+  maxAge: 15 * 24 * 60 * 60 * 1000, 
   sameSite: "none",
   httpOnly: true,
   secure: true
-}
+};
 const connectDB = (url) => {
   mongoose.connect(url,{dbName: "kabutar"})
   .then(() => {
@@ -19,14 +19,21 @@ const connectDB = (url) => {
     process.exit(1);
   });
 };
-const sendToken = (res,  user, statusCode, message) => {
-  const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET)
+
+const sendToken = (res, user, statusCode, message) => {
+  const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
+  
   console.log("Authenticated: " + user._id + " mode: Token");
-  return res.status(statusCode).cookie("token", token, cookieOptions).json({
-    success: true,
-    message
-  })
-}
+
+  return res
+    .status(statusCode)
+    .cookie("token", token, cookieOptions)
+    .json({
+      success: true,
+      message,
+      token 
+    });
+};
 
 
 const emitEvent = (req, event, users, data) => {
