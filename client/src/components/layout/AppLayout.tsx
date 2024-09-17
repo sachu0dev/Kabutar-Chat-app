@@ -22,9 +22,6 @@ import {
 import { getOrSaveFromStorage } from "../../lib/features";
 import DeleteChatMenu from "../dialog/DeleteChatMenu";
 import { RootState } from "../../redux/store";
-import { userExists, userNotExist } from "../../redux/reducers/auth";
-import { server } from "../../constants/config";
-import axios from "axios";
 
 const AppLayout = () => (WrappedComponent: React.FC) => {
   return (props) => {
@@ -89,13 +86,7 @@ const AppLayout = () => (WrappedComponent: React.FC) => {
 
     useSocketEvents(socket, eventHandlers);
 
-  
-    useEffect(() => {
-      axios
-        .get(`${server}/user/me`, { withCredentials: true })
-        .then((res) => dispatch(userExists(res.data.user)))
-        .catch(() => dispatch(userNotExist()));
-    }, [dispatch, user]);
+
 
     return (
       <>
