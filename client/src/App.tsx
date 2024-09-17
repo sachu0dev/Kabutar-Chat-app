@@ -20,12 +20,12 @@ const App = () => {
   const dispatch = useDispatch();
   const { user, loader } = useSelector((state: RootState) => state.auth);
 
-  useEffect(() => {
-    axios
-      .get(`${server}/user/me`, { withCredentials: true })
-      .then((res) => dispatch(userExists(res.data.user)))
-      .catch(() => dispatch(userNotExist()));
-  }, [dispatch, user]);
+  // useEffect(() => {
+  //   axios
+  //     .get(`${server}/user/me`, { withCredentials: true })
+  //     .then((res) => dispatch(userExists(res.data.user)))
+  //     .catch(() => dispatch(userNotExist()));
+  // }, [dispatch, user]);
 
   return loader ? (
     <LayoutLoader />

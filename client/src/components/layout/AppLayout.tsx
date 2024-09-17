@@ -86,6 +86,14 @@ const AppLayout = () => (WrappedComponent: React.FC) => {
 
     useSocketEvents(socket, eventHandlers);
 
+  
+    useEffect(() => {
+      axios
+        .get(`${server}/user/me`, { withCredentials: true })
+        .then((res) => dispatch(userExists(res.data.user)))
+        .catch(() => dispatch(userNotExist()));
+    }, [dispatch, user]);
+
     return (
       <>
         <Title title="chat" description="a chat app" />
