@@ -12,7 +12,7 @@ import { RootState } from "../../redux/store";
 const Profile = () => {
   const { user } = useSelector((state: RootState) => state.auth);
 
-  return user.avatar.url ? (
+  return user?.avatar?.url ? (
     <Stack spacing={"2rem"} direction={"column"} alignItems={"center"}>
       <Avatar
         sx={{
