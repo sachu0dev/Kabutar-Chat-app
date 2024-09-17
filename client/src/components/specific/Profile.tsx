@@ -12,7 +12,7 @@ import { RootState } from "../../redux/store";
 const Profile = () => {
   const { user } = useSelector((state: RootState) => state.auth);
 
-  const isLoading = !user;
+  const isLoading = !user.username && !user.bio && !user.avatar.url;
 
   return (
     <Stack spacing={"2rem"} direction={"column"} alignItems={"center"}>
