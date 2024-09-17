@@ -22,6 +22,13 @@ import { Chat } from './models/chat.js';
 // Setup
 const app = express();
 const server = createServer(app);
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', process.env.CLIENT_URL);
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Allow-Methods', 'GET,HEAD,OPTIONS,POST,PUT');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  next();
+});
 const allowedOrigins = ["http://localhost:5173", "http://localhost:4173", process.env.CLIENT_URL];
 const io = new Server(server, {
   cors: {
@@ -33,11 +40,11 @@ const io = new Server(server, {
 const limiter = rateLimit({
 	windowMs: 15 * 60 * 1000, 
 	limit: 100,
-	standardHeaders: 'draft-7', 
+	standardHeaders: 'draft-7',
 	legacyHeaders: false,
 })
 
-// app.use(limiter)
+app.use(limiter)
 
 app.set("io", io)
 const userSocketIDs = new Map();

@@ -7,7 +7,8 @@ const cookieOptions = {
   maxAge: 15 * 24 * 60 * 60 * 1000, 
   sameSite: "none",
   httpOnly: true,
-  secure: true
+  secure: true,
+  domain: "https://kabutar-chat-server.onrender.com"
 };
 const connectDB = (url) => {
   mongoose.connect(url,{dbName: "kabutar"})

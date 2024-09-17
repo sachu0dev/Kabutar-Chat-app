@@ -60,12 +60,23 @@ const getMyprofile = TryCatch(async (req, res, next) => {
   res.status(200).json({ success: true, user });
 });
 
-const logout = TryCatch(async (req, res) => {
-  res.status(200).cookie("token", null, { expires: new Date(Date.now()), httpOnly: true }).json({
-    success: true,
-    message: "Logged Out"
-  });
-});
+const logout = async (req, res) => {
+  try {
+    res
+      .status(200)
+      .cookie("token", "", { expires: new Date(0), httpOnly: true })
+      .json({
+        success: true,
+        message: "Logged Out"
+      });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "An error occurred while logging out"
+    });
+  }
+};
+
 
 const searchUser = TryCatch(async (req, res, next) => {
   const { name = '' } = req.query;

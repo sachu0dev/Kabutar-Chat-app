@@ -7,7 +7,7 @@ import { server } from "./constants/config";
 import { useDispatch, useSelector } from "react-redux";
 import { userExists, userNotExist } from "./redux/reducers/auth";
 import { Toaster } from "react-hot-toast";
-import { RootState } from "./redux/store"; // Assuming you have RootState type defined
+import { RootState } from "./redux/store";
 import { SocketProvider } from "./socket";
 
 const Home = lazy(() => import("./pages/Home"));
@@ -15,6 +15,7 @@ const Login = lazy(() => import("./pages/Login"));
 const Chat = lazy(() => import("./pages/Chat"));
 const Groups = lazy(() => import("./pages/Groups"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+
 const App = () => {
   const dispatch = useDispatch();
   const { user, loader } = useSelector((state: RootState) => state.auth);
@@ -24,7 +25,7 @@ const App = () => {
       .get(`${server}/user/me`, { withCredentials: true })
       .then((res) => dispatch(userExists(res.data.user)))
       .catch(() => dispatch(userNotExist()));
-  }, []);
+  }, [dispatch]);
 
   return loader ? (
     <LayoutLoader />
@@ -46,7 +47,6 @@ const App = () => {
           <Route element={<ProtectRoute user={!user} redirect={"/"} />}>
             <Route path="/login" element={<Login />} />
           </Route>
-          
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
