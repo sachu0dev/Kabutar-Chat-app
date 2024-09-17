@@ -69,7 +69,7 @@ const logout = async (req, res) => {
         expires: new Date(0),
         secure: true, 
         sameSite: 'None', 
-        domain: 'https://kabutar-chat-server.onrender.com'
+        domain: 'kabutar-chat-server.onrender.com'
       })
       .json({
         success: true,
