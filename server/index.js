@@ -44,7 +44,7 @@ const limiter = rateLimit({
 	legacyHeaders: false,
 })
 
-app.use(limiter)
+// app.use(limiter)
 
 app.set("io", io)
 const userSocketIDs = new Map();
