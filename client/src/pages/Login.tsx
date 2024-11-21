@@ -56,7 +56,7 @@ function Login() {
         config
       );
       toast.success(data.message);
-        navigate("/");
+      window.location.href = "/";
       dispatch(userExists(true));
     } catch (error: any) {
       console.log(error);
@@ -90,8 +90,6 @@ function Login() {
       toast.error(error?.response?.data?.message || "Something went wrong");
     }
   };
-
-
 
   return (
     <div
