@@ -29,7 +29,7 @@ app.use((req, res, next) => {
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   next();
 });
-const allowedOrigins = ["http://localhost:5173", "http://localhost:4173", process.env.CLIENT_URL];
+const allowedOrigins = ["http://localhost:5173", "http://localhost:4173", "https://kabutar-chat-app.vercel.app" process.env.CLIENT_URL];
 const io = new Server(server, {
   cors: {
     origin: allowedOrigins,
